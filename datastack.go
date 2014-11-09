@@ -16,6 +16,7 @@ type datastack struct {
 	FunctionMap FunctionMap
 }
 
+// NewDataStack is a constructor for datastack.
 func NewDataStack(elements Elements, functions FunctionMap) *datastack {
 	d := &datastack{stack{elements}, functions}
 	addCommonFunctions(d)
@@ -81,16 +82,17 @@ func (s *datastack) Call(method string, i Interpreter) {
 	}
 }
 
+// A NullDataStack is a DataStack that has nothing and does nothing.
 type NullDataStack struct {
 	datastack
 }
 
-// Functions returns the FunctionMap of the datastack
+// Functions returns a FunctionMap that is always empty.
 func (s *NullDataStack) Functions() FunctionMap {
 	return FunctionMap{}
 }
 
-// Call calls a method from the FunctionMap
+// Call calls a method from the FunctionMap which in NullDataStack's case is nothing.
 func (s *NullDataStack) Call(method string, i Interpreter) {
 	// Does nothing
 }
