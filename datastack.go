@@ -16,20 +16,55 @@ type datastack struct {
 	FunctionMap FunctionMap
 }
 
-func NewDataStack(elements Elements, functions FunctionMap) datastack {
-	d := datastack{stack{elements}, functions}
+func NewDataStack(elements Elements, functions FunctionMap) *datastack {
+	d := &datastack{stack{elements}, functions}
 	addCommonFunctions(d)
 	return d
 }
 
-func addCommonFunctions(ds datastack) {
+func addCommonFunctions(ds *datastack) {
 
 	ds.FunctionMap["pop"] = func(d DataStack, i Interpreter) {
 		d.Pop()
 	}
 
+	ds.FunctionMap["swap"] = func(d DataStack, i Interpreter) {
+		d.Swap()
+	}
+
 	ds.FunctionMap["rotate"] = func(d DataStack, i Interpreter) {
 		d.Rotate()
+	}
+
+	ds.FunctionMap["shove"] = func(d DataStack, i Interpreter) {
+		if i.Bad("integer", 1) {
+			return
+		}
+
+		idx := i.Stack("integer").Pop().(int64)
+		d.Shove(d.Pop(), idx)
+	}
+
+	ds.FunctionMap["yank"] = func(d DataStack, i Interpreter) {
+		if i.Bad("integer", 1) {
+			return
+		}
+
+		idx := i.Stack("integer").Pop().(int64)
+		d.Yank(idx)
+	}
+
+	ds.FunctionMap["yankdup"] = func(d DataStack, i Interpreter) {
+		if i.Bad("integer", 1) {
+			return
+		}
+
+		idx := i.Stack("integer").Pop().(int64)
+		d.YankDup(idx)
+	}
+
+	ds.FunctionMap["stackdepth"] = func(d DataStack, i Interpreter) {
+		i.Stack("integer").Push(d.Size())
 	}
 }
 

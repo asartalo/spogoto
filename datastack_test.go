@@ -6,10 +6,11 @@ import (
 )
 
 func TestDataStack(t *testing.T) {
+	i := NewInterpreter()
+
 	Convey("Given a stack with 4 elements and a function definition", t, func() {
 		elements := Elements{"a", "b", "c", "d"}
 		functions := make(FunctionMap)
-		i := Interpreter{}
 		functions["foo"] = func(s DataStack, i Interpreter) {
 			s.Push("e")
 		}
@@ -44,6 +45,14 @@ func TestDataStack(t *testing.T) {
 			})
 		})
 
+		Convey("When 'swap' is Call()ed", func() {
+			s.Call("swap", i)
+			Convey("It should swap the positions of the top two elements", func() {
+				So(s.Pop(), ShouldEqual, "c")
+				So(s.Pop(), ShouldEqual, "d")
+			})
+		})
+
 		Convey("When 'rotate' is Call()ed", func() {
 			s.Call("rotate", i)
 
@@ -52,6 +61,69 @@ func TestDataStack(t *testing.T) {
 				So(s.Pop(), ShouldEqual, "d")
 				So(s.Pop(), ShouldEqual, "c")
 			})
+		})
+
+		Convey("And a registered integer stack with element 2", func() {
+			iStack := NewDataStack(Elements{int64(2)}, FunctionMap{})
+			i.RegisterStack("integer", iStack)
+
+			Convey("When 'shove' is Call()ed", func() {
+				s.Call("shove", i)
+
+				Convey("It should shove the top most element to the 2 position", func() {
+					So(s.Pop(), ShouldEqual, "c")
+					So(s.Pop(), ShouldEqual, "b")
+					So(s.Pop(), ShouldEqual, "d")
+				})
+			})
+
+			Convey("When 'yank' is Call()ed", func() {
+				s.Call("yank", i)
+
+				Convey("It pulls the 2nd element off the stack and places it on top", func() {
+					So(s.Pop(), ShouldEqual, "b")
+				})
+			})
+
+			Convey("When 'yankdup' is Call()ed", func() {
+				s.Call("yankdup", i)
+
+				Convey("It copies the 2nd element stack and places the copy on top", func() {
+					So(s.Size(), ShouldEqual, 5)
+					So(s.Pop(), ShouldEqual, "b")
+				})
+			})
+
+			Convey("When 'stackdepth' is Call()ed", func() {
+				s.Call("stackdepth", i)
+
+				Convey("It should push the size of the stack to the integer stack", func() {
+					So(iStack.Pop(), ShouldEqual, 4)
+				})
+			})
+
+		})
+	})
+
+	Convey("Given an empty datastack", t, func() {
+		s := NewDataStack(Elements{}, FunctionMap{})
+
+		Convey("And a registered integer stack with no elements", func() {
+			iStack := NewDataStack(Elements{}, FunctionMap{})
+			i.RegisterStack("integer", iStack)
+
+			Convey("A Call() to 'shove' must not panic", func() {
+				So(func() { s.Call("shove", i) }, ShouldNotPanic)
+			})
+
+			Convey("A Call() to 'yank' must not panic", func() {
+				So(func() { s.Call("yank", i) }, ShouldNotPanic)
+			})
+
+			Convey("A Call() to 'yankdup' must not panic", func() {
+				So(func() { s.Call("yankdup", i) }, ShouldNotPanic)
+			})
+
 		})
 	})
 
