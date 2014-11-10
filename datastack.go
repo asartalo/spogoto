@@ -67,6 +67,14 @@ func addCommonFunctions(ds *datastack) {
 	ds.FunctionMap["stackdepth"] = func(d DataStack, i Interpreter) {
 		i.Stack("integer").Push(d.Size())
 	}
+
+	ds.FunctionMap["flush"] = func(d DataStack, i Interpreter) {
+		d.Flush()
+	}
+
+	ds.FunctionMap["dup"] = func(d DataStack, i Interpreter) {
+		d.Dup()
+	}
 }
 
 // Functions returns the FunctionMap of the datastack

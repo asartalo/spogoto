@@ -16,10 +16,6 @@ func TestDataStack(t *testing.T) {
 		}
 		s := NewDataStack(elements, functions)
 
-		Convey("Size works", func() {
-			So(s.Size(), ShouldEqual, 4)
-		})
-
 		Convey("FunctionMap() should return function map", func() {
 			So(s.Functions(), ShouldEqual, functions)
 		})
@@ -53,6 +49,15 @@ func TestDataStack(t *testing.T) {
 			})
 		})
 
+		Convey("When 'dup' is Call()ed", func() {
+			s.Call("dup", i)
+			Convey("It should duplicate the top element", func() {
+				So(s.Size(), ShouldEqual, 5)
+				So(s.Pop(), ShouldEqual, "d")
+				So(s.Pop(), ShouldEqual, "d")
+			})
+		})
+
 		Convey("When 'rotate' is Call()ed", func() {
 			s.Call("rotate", i)
 
@@ -60,6 +65,14 @@ func TestDataStack(t *testing.T) {
 				So(s.Pop(), ShouldEqual, "b")
 				So(s.Pop(), ShouldEqual, "d")
 				So(s.Pop(), ShouldEqual, "c")
+			})
+		})
+
+		Convey("When 'flush' is Call()ed", func() {
+			s.Call("flush", i)
+
+			Convey("It should empty the stack", func() {
+				So(s.Size(), ShouldEqual, 0)
 			})
 		})
 
