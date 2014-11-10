@@ -11,12 +11,14 @@ type Stack interface {
 	Size() int64
 	IsEmpty() bool
 	Has(n int64) bool
+	Lack(n int64) bool
 	Peek() Element
 	Pop() Element
 	Push(i Element)
 	Swap()
 	Flush()
 	Rotate()
+	Dup()
 	Yank(idx int64)
 	YankDup(idx int64)
 	Shove(e Element, idx int64)
@@ -44,6 +46,11 @@ func (s *stack) IsEmpty() bool {
 // Has returns true if it has n or more elements in the stack.
 func (s *stack) Has(n int64) bool {
 	return n <= s.Size()
+}
+
+// Lack returns false if it has n or more elements in the stack.
+func (s *stack) Lack(n int64) bool {
+	return n > s.Size()
 }
 
 // Peek returns the topmost value on the stack or nil if there are no values
@@ -83,6 +90,15 @@ func (s *stack) Swap() {
 	last1 := s.Size() - 1
 	last2 := last1 - 1
 	s.elements[last1], s.elements[last2] = s.elements[last2], s.elements[last1]
+}
+
+// Dup copies the top element and pushes the copy to the stack.
+func (s *stack) Dup() {
+	if s.Size() < 1 {
+		return
+	}
+
+	s.elements = append(s.elements, s.elements[s.Size()-1])
 }
 
 // Flush empties the stack.

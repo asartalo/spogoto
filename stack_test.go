@@ -119,6 +119,14 @@ func TestStack(t *testing.T) {
 
 		})
 
+		Convey("When Dup() is called", func() {
+			s.Dup()
+			Convey("It should copy the top element", func() {
+				So(s.Pop(), ShouldEqual, "d")
+				So(s.Pop(), ShouldEqual, "d")
+			})
+		})
+
 		Convey("When an element is YankDup()ed", func() {
 			Convey("With 3", func() {
 				s.YankDup(1)
@@ -166,6 +174,13 @@ func TestStack(t *testing.T) {
 			So(s.Has(5), ShouldBeFalse)
 		})
 
+		Convey("Lack() with number of elements within Size() should return false", func() {
+			So(s.Lack(2), ShouldBeFalse)
+			So(s.Lack(4), ShouldBeFalse)
+			So(s.Lack(1), ShouldBeFalse)
+			So(s.Lack(5), ShouldBeTrue)
+		})
+
 	})
 
 	Convey("Given an empty stack", t, func() {
@@ -197,6 +212,10 @@ func TestStack(t *testing.T) {
 
 		Convey("YankDup() should do nothing and not panic", func() {
 			So(func() { s.YankDup(1) }, ShouldNotPanic)
+		})
+
+		Convey("Dup() should do nothing and not panic", func() {
+			So(func() { s.Dup() }, ShouldNotPanic)
 		})
 
 		Convey("Shove() should do nothing and not panic", func() {
