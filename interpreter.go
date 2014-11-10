@@ -29,7 +29,7 @@ func (i Interpreter) Ok(name string, count int64) bool {
 // Bad returns false if stack is available and has the number of elements
 // required.
 func (i Interpreter) Bad(name string, count int64) bool {
-	return i.Stack(name).Size() < count
+	return i.Stack(name).Lack(count)
 }
 
 // NewInterpreter constructs a new Intepreter.
