@@ -46,5 +46,10 @@ func TestInterpreter(t *testing.T) {
 				So(i.Bad("foo", 1), ShouldBeFalse)
 			})
 		})
+
+		Convey("RandInt() should generate a random integer", func() {
+			So(i.RandInt(), ShouldBeLessThan, 10)
+			So(i.RandInt(), ShouldBeGreaterThan, -1)
+		})
 	})
 }

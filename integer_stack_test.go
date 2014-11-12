@@ -6,22 +6,6 @@ import (
 	"testing"
 )
 
-func int64Elements(ints []int64) Elements {
-	elements := Elements{}
-	for _, v := range ints {
-		elements = append(elements, int64(v))
-	}
-	return elements
-}
-
-func boolElements(bools []bool) Elements {
-	elements := Elements{}
-	for _, v := range bools {
-		elements = append(elements, bool(v))
-	}
-	return elements
-}
-
 func TestIntegerStackArithmeticFunctions(t *testing.T) {
 	i := NewInterpreter()
 
@@ -53,63 +37,97 @@ func TestIntegerStackArithmeticFunctions(t *testing.T) {
 
 func TestIntegerStackBooleanFunctions(t *testing.T) {
 
-	testData := []struct {
-		fn     string
-		before []int64
-		after  []int64
-		bools  []bool
-	}{
+	testData := spogotoTestData{
 		{
 			">",
-			[]int64{1, 2, 6, 2},
-			[]int64{1, 2},
-			[]bool{true},
+			[]int64{1, 2, 6, 2}, []int64{1, 2},
+			[]bool{}, []bool{true},
+			[]float64{}, []float64{},
 		},
 		{
 			">",
-			[]int64{1, 0, 1, 2},
-			[]int64{1, 0},
-			[]bool{false},
+			[]int64{1, 0, 1, 2}, []int64{1, 0},
+			[]bool{}, []bool{false},
+			[]float64{}, []float64{},
 		},
 		{
 			"<",
-			[]int64{1, 2, 6, 2},
-			[]int64{1, 2},
-			[]bool{false},
+			[]int64{1, 2, 6, 2}, []int64{1, 2},
+			[]bool{}, []bool{false},
+			[]float64{}, []float64{},
 		},
 		{
 			"<",
-			[]int64{1, 0, 1, 2},
-			[]int64{1, 0},
-			[]bool{true},
+			[]int64{1, 0, 1, 2}, []int64{1, 0},
+			[]bool{}, []bool{true},
+			[]float64{}, []float64{},
 		},
 		{
 			"=",
-			[]int64{9, 8, 7, 7},
-			[]int64{9, 8},
-			[]bool{true},
+			[]int64{9, 8, 7, 7}, []int64{9, 8},
+			[]bool{}, []bool{true},
+			[]float64{}, []float64{},
 		},
 		{
 			"=",
-			[]int64{9, 8, 7, 8},
-			[]int64{9, 8},
-			[]bool{false},
+			[]int64{9, 8, 7, 8}, []int64{9, 8},
+			[]bool{}, []bool{false},
+			[]float64{}, []float64{},
+		},
+		{
+			"fromboolean",
+			[]int64{}, []int64{1},
+			[]bool{true}, []bool{},
+			[]float64{}, []float64{},
+		},
+		{
+			"fromboolean",
+			[]int64{}, []int64{0},
+			[]bool{false}, []bool{},
+			[]float64{}, []float64{},
+		},
+		{
+			"fromfloat",
+			[]int64{}, []int64{7},
+			[]bool{}, []bool{},
+			[]float64{7.35}, []float64{},
 		},
 	}
 
 	for _, d := range testData {
 		i := NewInterpreter()
-		boolStack := NewDataStack(Elements{}, FunctionMap{})
+		boolStack := NewDataStack(boolElements(d.boolsBefore), FunctionMap{})
+		floatStack := NewDataStack(float64Elements(d.floatsBefore), FunctionMap{})
 		i.RegisterStack("boolean", boolStack)
+		i.RegisterStack("float", floatStack)
 
-		Convey(fmt.Sprintf("Call()ing '%s' with integer stack %v should result %v", d.fn, d.before, d.bools), t, func() {
-			s := NewIntegerStack(d.before)
+		Convey(fmt.Sprintf("Call()ing '%s' with integer stack %v should result %v", d.fn, d.intsBefore, d.boolsAfter), t, func() {
+			s := NewIntegerStack(d.intsBefore)
 			s.Call(d.fn, i)
-			So(s.elements, ShouldResemble, int64Elements(d.after))
-			So(boolStack.elements, ShouldResemble, boolElements(d.bools))
+			So(s.elements, ShouldResemble, int64Elements(d.intsAfter))
+			So(boolStack.elements, ShouldResemble, boolElements(d.boolsAfter))
+			So(floatStack.elements, ShouldResemble, float64Elements(d.floatsAfter))
 		})
 
 	}
+}
+
+func TestRandomInteger(t *testing.T) {
+	Convey("Given an empty datastack", t, func() {
+		i := NewInterpreter()
+		s := NewIntegerStack([]int64{})
+
+		Convey("When 'rand' is Call()ed", func() {
+			s.Call("rand", i)
+
+			Convey("It should generate a random integer from 0 to 9", func() {
+				val := s.Pop()
+				So(val, ShouldBeLessThan, 10)
+				So(val, ShouldBeGreaterThan, -1)
+			})
+		})
+
+	})
 }
 
 func TestEmptyIntegerStack(t *testing.T) {
@@ -124,13 +142,16 @@ func TestEmptyIntegerStack(t *testing.T) {
 
 	for _, fn := range functions {
 		boolStack := NewDataStack(Elements{}, FunctionMap{})
+		floatStack := NewDataStack(Elements{}, FunctionMap{})
 		i.RegisterStack("boolean", boolStack)
+		i.RegisterStack("float", floatStack)
 
 		Convey(fmt.Sprintf("For empty stacks, Call()ing '%s' should not panic and do nothing", fn), t, func() {
 			s := NewIntegerStack(elements)
 			So(func() { s.Call(fn, i) }, ShouldNotPanic)
 			So(s.elements, ShouldResemble, int64Elements([]int64{}))
 			So(boolStack.elements, ShouldResemble, boolElements([]bool{}))
+			So(floatStack.elements, ShouldResemble, float64Elements([]float64{}))
 		})
 	}
 }

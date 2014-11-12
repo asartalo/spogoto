@@ -120,4 +120,30 @@ func addIntegerFunctions(ds *datastack) {
 		i.Stack("boolean").Push(d.Pop().(int64) == d.Pop().(int64))
 	}
 
+	ds.FunctionMap["fromboolean"] = func(d DataStack, i Interpreter) {
+		if i.Bad("boolean", 1) {
+			return
+		}
+
+		b := i.Stack("boolean").Pop().(bool)
+		if b {
+			d.Push(int64(1))
+		} else {
+			d.Push(int64(0))
+		}
+	}
+
+	ds.FunctionMap["fromfloat"] = func(d DataStack, i Interpreter) {
+		if i.Bad("float", 1) {
+			return
+		}
+
+		f := i.Stack("float").Pop().(float64)
+		d.Push(int64(f))
+	}
+
+	ds.FunctionMap["rand"] = func(d DataStack, i Interpreter) {
+		d.Push(i.RandInt())
+	}
+
 }
