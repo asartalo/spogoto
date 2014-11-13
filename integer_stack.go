@@ -34,8 +34,7 @@ func addIntegerFunctions(ds *datastack) {
 			return
 		}
 
-		s := -d.Pop().(int64) + d.Pop().(int64)
-		d.Push(s)
+		d.Push(-d.Pop().(int64) + d.Pop().(int64))
 	}
 
 	ds.FunctionMap["/"] = func(d DataStack, i Interpreter) {
