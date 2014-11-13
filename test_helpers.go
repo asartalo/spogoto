@@ -1,6 +1,6 @@
 package spogoto
 
-type spogotoTestData []struct {
+type spogotoTestItem struct {
 	fn           string
 	intsBefore   []int64
 	intsAfter    []int64
@@ -9,6 +9,8 @@ type spogotoTestData []struct {
 	floatsBefore []float64
 	floatsAfter  []float64
 }
+
+type spogotoTestData []spogotoTestItem
 
 func int64Elements(ints []int64) Elements {
 	elements := Elements{}
