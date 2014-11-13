@@ -11,6 +11,7 @@ type Interpreter interface {
 	Ok(string, int64) bool
 	Bad(string, int64) bool
 	RandInt() int64
+	RandFloat() float64
 }
 
 type interpreter struct {
@@ -47,6 +48,10 @@ func (i *interpreter) Bad(name string, count int64) bool {
 
 func (i *interpreter) RandInt() int64 {
 	return i.Rand.Int63n(10)
+}
+
+func (i *interpreter) RandFloat() float64 {
+	return i.Rand.Float64()
 }
 
 // NewInterpreter constructs a new Intepreter.

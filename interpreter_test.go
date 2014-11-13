@@ -51,5 +51,11 @@ func TestInterpreter(t *testing.T) {
 			So(i.RandInt(), ShouldBeLessThan, 10)
 			So(i.RandInt(), ShouldBeGreaterThan, -1)
 		})
+
+		Convey("RandFloat() should generate a random integer", func() {
+			So(i.RandFloat(), ShouldBeLessThan, 1.0)
+			So(i.RandFloat(), ShouldBeGreaterThanOrEqualTo, -0.0)
+		})
+
 	})
 }
