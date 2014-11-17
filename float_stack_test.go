@@ -8,37 +8,22 @@ import (
 )
 
 func TestFloatStackFunctions(t *testing.T) {
-	floatOnly := func(fn string, fs1 []float64, fs2 []float64) spogotoTestItem {
-		return spogotoTestItem{
-			fn,
-			[]int64{}, []int64{},
-			[]bool{}, []bool{},
-			fs1, fs2,
-		}
-	}
-
-	nothingHappens := func(fn string) spogotoTestItem {
-		return spogotoTestItem{
-			fn,
-			[]int64{}, []int64{},
-			[]bool{}, []bool{},
-			[]float64{}, []float64{},
-		}
-	}
 
 	testData := spogotoTestData{
-		floatOnly("+", []float64{1.0, 6.0, 2.0}, []float64{1.0, 8.0}),
-		floatOnly("-", []float64{1.0, 6.0, 2.0}, []float64{1.0, 4.0}),
-		floatOnly("*", []float64{1.0, 6.0, 2.0}, []float64{1.0, 12.0}),
-		floatOnly("/", []float64{1.0, 6.0, 2.0}, []float64{1.0, 3.0}),
-		floatOnly("/", []float64{1.0, 6.0, 0.0}, []float64{1.0, 6.0, 0.0}),
-		floatOnly("%", []float64{1.0, 6.0, 2.0}, []float64{1.0, 0.0}),
-		floatOnly("%", []float64{1.0, 6.0, 0.0}, []float64{1.0, 6.0, 0.0}),
-		floatOnly("min", []float64{1.0, 6.0, 2.0}, []float64{1.0, 2.0}),
-		floatOnly("max", []float64{1.0, 6.0, 2.0}, []float64{1.0, 6.0}),
-		floatOnly("sin", []float64{7.0}, []float64{math.Sin(7.0)}),
-		floatOnly("cos", []float64{7.0}, []float64{math.Cos(7.0)}),
-		floatOnly("tan", []float64{7.0}, []float64{math.Tan(7.0)}),
+		floatsOnly("+", []float64{1.0, 6.0, 2.0}, []float64{1.0, 8.0}),
+		floatsOnly("-", []float64{1.0, 6.0, 2.0}, []float64{1.0, 4.0}),
+		floatsOnly("*", []float64{1.0, 6.0, 2.0}, []float64{1.0, 12.0}),
+		floatsOnly("/", []float64{1.0, 6.0, 2.0}, []float64{1.0, 3.0}),
+		floatsOnly("/", []float64{1.0, 6.0, 0.0}, []float64{1.0, 6.0, 0.0}),
+		floatsOnly("%", []float64{1.0, 6.0, 2.0}, []float64{1.0, 0.0}),
+		floatsOnly("%", []float64{1.0, 6.0, 0.0}, []float64{1.0, 6.0, 0.0}),
+		floatsOnly("min", []float64{1.0, 6.0, 2.0}, []float64{1.0, 2.0}),
+		floatsOnly("min", []float64{1.0, 6.0, 8.0}, []float64{1.0, 6.0}),
+		floatsOnly("max", []float64{1.0, 6.0, 2.0}, []float64{1.0, 6.0}),
+		floatsOnly("max", []float64{1.0, 6.0, 8.0}, []float64{1.0, 8.0}),
+		floatsOnly("sin", []float64{7.0}, []float64{math.Sin(7.0)}),
+		floatsOnly("cos", []float64{7.0}, []float64{math.Cos(7.0)}),
+		floatsOnly("tan", []float64{7.0}, []float64{math.Tan(7.0)}),
 
 		{
 			">",
@@ -96,36 +81,48 @@ func TestFloatStackFunctions(t *testing.T) {
 		},
 
 		// Empties
-		nothingHappens("+"),
-		nothingHappens("-"),
-		nothingHappens("*"),
-		nothingHappens("/"),
-		nothingHappens("%"),
-		nothingHappens("min"),
-		nothingHappens("max"),
-		nothingHappens(">"),
-		nothingHappens("<"),
-		nothingHappens("="),
-		nothingHappens("sin"),
-		nothingHappens("cos"),
-		nothingHappens("tan"),
+		tnothingHappens("+"),
+		tnothingHappens("-"),
+		tnothingHappens("*"),
+		tnothingHappens("/"),
+		tnothingHappens("%"),
+		tnothingHappens("min"),
+		tnothingHappens("max"),
+		tnothingHappens(">"),
+		tnothingHappens("<"),
+		tnothingHappens("="),
+		tnothingHappens("sin"),
+		tnothingHappens("cos"),
+		tnothingHappens("tan"),
+		tnothingHappens("fromboolean"),
+		tnothingHappens("frominteger"),
 	}
 
 	for _, d := range testData {
 		i := NewInterpreter()
-		boolStack := NewDataStack(boolElements(d.boolsBefore), FunctionMap{})
-		integerStack := NewDataStack(int64Elements(d.intsBefore), FunctionMap{})
-		i.RegisterStack("boolean", boolStack)
-		i.RegisterStack("integer", integerStack)
 
-		Convey(fmt.Sprintf("Call()ing '%s' with float stack %v", d.fn, d.floatsBefore), t, func() {
+		Convey(tPrimaryMessage("boolean", d), t, func() {
+			boolStack := NewDataStack(boolElements(d.boolsBefore), FunctionMap{})
+			integerStack := NewDataStack(int64Elements(d.intsBefore), FunctionMap{})
+			i.RegisterStack("boolean", boolStack)
+			i.RegisterStack("integer", integerStack)
+
 			s := NewFloatStack(d.floatsBefore)
-			So(func() { s.Call(d.fn, i) }, ShouldNotPanic)
-			So(s.elements, ShouldResemble, float64Elements(d.floatsAfter))
-			So(boolStack.elements, ShouldResemble, boolElements(d.boolsAfter))
-			So(integerStack.elements, ShouldResemble, int64Elements(d.intsAfter))
-		})
+			Convey("It shouldn't panic", func() {
+				So(func() { s.Call(d.fn, i) }, ShouldNotPanic)
 
+				Convey(fmt.Sprintf("Float elements should be %v", d.floatsAfter), func() {
+					So(s.elements, ShouldResemble, float64Elements(d.floatsAfter))
+				})
+
+				Convey(tBoolMessaging(d.boolsBefore, d.boolsAfter), func() {
+					So(boolStack.elements, ShouldResemble, boolElements(d.boolsAfter))
+				})
+				Convey(tIntMessaging(d.intsBefore, d.intsAfter), func() {
+					So(integerStack.elements, ShouldResemble, int64Elements(d.intsAfter))
+				})
+			})
+		})
 	}
 }
 

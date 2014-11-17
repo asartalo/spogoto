@@ -50,6 +50,15 @@ func tintsOnly(fn string, is1 []int64, is2 []int64) spogotoTestItem {
 
 }
 
+func floatsOnly(fn string, fs1 []float64, fs2 []float64) spogotoTestItem {
+	return spogotoTestItem{
+		fn,
+		[]int64{}, []int64{},
+		[]bool{}, []bool{},
+		fs1, fs2,
+	}
+}
+
 func tbooleansOnly(fn string, bs1 []bool, bs2 []bool) spogotoTestItem {
 	return spogotoTestItem{
 		fn,

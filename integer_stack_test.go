@@ -115,9 +115,7 @@ func TestIntegerStackFunctions(t *testing.T) {
 				Convey(tFloatMessaging(d.floatsBefore, d.floatsAfter), func() {
 					So(floatStack.elements, ShouldResemble, float64Elements(d.floatsAfter))
 				})
-
 			})
-
 		})
 
 	}

@@ -61,12 +61,13 @@ func TestBooleanStackFunctions(t *testing.T) {
 
 	for _, d := range testData {
 		i := NewInterpreter()
-		integerStack := NewDataStack(int64Elements(d.intsBefore), FunctionMap{})
-		floatStack := NewDataStack(float64Elements(d.floatsBefore), FunctionMap{})
-		i.RegisterStack("integer", integerStack)
-		i.RegisterStack("float", floatStack)
 
 		Convey(tPrimaryMessage("boolean", d), t, func() {
+			integerStack := NewDataStack(int64Elements(d.intsBefore), FunctionMap{})
+			floatStack := NewDataStack(float64Elements(d.floatsBefore), FunctionMap{})
+			i.RegisterStack("integer", integerStack)
+			i.RegisterStack("float", floatStack)
+
 			s := NewBooleanStack(d.boolsBefore)
 			Convey("It shouldn't panic", func() {
 				So(func() { s.Call(d.fn, i) }, ShouldNotPanic)
