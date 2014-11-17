@@ -66,7 +66,7 @@ func TestBooleanStackFunctions(t *testing.T) {
 		i.RegisterStack("integer", integerStack)
 		i.RegisterStack("float", floatStack)
 
-		Convey(tBoolPrimaryMessaging(d), t, func() {
+		Convey(tPrimaryMessage("boolean", d), t, func() {
 			s := NewBooleanStack(d.boolsBefore)
 			Convey("It shouldn't panic", func() {
 				So(func() { s.Call(d.fn, i) }, ShouldNotPanic)

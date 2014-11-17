@@ -40,6 +40,16 @@ func boolElements(bools []bool) Elements {
 	return elements
 }
 
+func tintsOnly(fn string, is1 []int64, is2 []int64) spogotoTestItem {
+	return spogotoTestItem{
+		fn,
+		is1, is2,
+		[]bool{}, []bool{},
+		[]float64{}, []float64{},
+	}
+
+}
+
 func tbooleansOnly(fn string, bs1 []bool, bs2 []bool) spogotoTestItem {
 	return spogotoTestItem{
 		fn,
@@ -53,14 +63,42 @@ func tnothingHappens(fn string) spogotoTestItem {
 	return tbooleansOnly(fn, []bool{}, []bool{})
 }
 
-func tBoolPrimaryMessaging(d spogotoTestItem) (message string) {
-	message = fmt.Sprintf("Call()ing '%s' with boolean stack %v", d.fn, d.boolsBefore)
-	if len(d.intsBefore) > 0 {
+func tPrimaryMessage(t string, d spogotoTestItem) (message string) {
+	var before interface{}
+	switch t {
+	case "integer":
+		before = d.intsBefore
+	case "float":
+		before = d.floatsBefore
+	case "boolean":
+		before = d.boolsBefore
+	}
+
+	message = fmt.Sprintf("Call()ing '%s' with %s stack %v", d.fn, t, before)
+	if len(d.intsBefore) > 0 && t != "integer" {
 		message += fmt.Sprintf(" with integer stack %v", d.intsBefore)
 	}
-	if len(d.floatsBefore) > 0 {
-		message += fmt.Sprintf(" with float stack %v", d.floatsBefore)
+	if len(d.boolsBefore) > 0 && t != "boolean" {
+		message += fmt.Sprintf(" and boolean stack %v", d.boolsBefore)
 	}
+	if len(d.floatsBefore) > 0 && t != "float" {
+		message += fmt.Sprintf(" and float stack %v", d.floatsBefore)
+	}
+
+	return message
+
+}
+
+func tBoolMessaging(before []bool, after []bool) (message string) {
+	if len(before) == 0 && len(after) == 0 {
+		message = "It shouldn't modify the boolean stack"
+	} else {
+		message = fmt.Sprintf(
+			"It should modify the boolean stack from %v to %v",
+			before, after,
+		)
+	}
+
 	return message
 }
 

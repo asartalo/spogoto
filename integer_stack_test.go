@@ -6,38 +6,21 @@ import (
 	"testing"
 )
 
-func TestIntegerStackArithmeticFunctions(t *testing.T) {
-	i := NewInterpreter()
-
-	testData := []struct {
-		fn     string
-		before []int64
-		after  []int64
-	}{
-		{"+", []int64{1, 2, 6, 2}, []int64{1, 2, 8}},
-		{"*", []int64{1, 2, 6, 2}, []int64{1, 2, 12}},
-		{"-", []int64{1, 2, 6, 2}, []int64{1, 2, 4}},
-		{"/", []int64{1, 2, 6, 2}, []int64{1, 2, 3}},
-		{"/", []int64{6, 0}, []int64{6, 0}},
-		{"%", []int64{1, 2, 6, 2}, []int64{1, 2, 0}},
-		{"%", []int64{6, 0}, []int64{6, 0}},
-		{"min", []int64{1, 2, 6, 2}, []int64{1, 2, 2}},
-		{"max", []int64{1, 2, 6, 2}, []int64{1, 2, 6}},
-	}
-
-	for _, d := range testData {
-		Convey(fmt.Sprintf("Call()ing '%s' should result %v", d.fn, d.after), t, func() {
-			s := NewIntegerStack(d.before)
-			So(func() { s.Call(d.fn, i) }, ShouldNotPanic)
-			So(s.elements, ShouldResemble, int64Elements(d.after))
-		})
-
-	}
-}
-
-func TestIntegerStackBooleanFunctions(t *testing.T) {
-
+func TestIntegerStackFunctions(t *testing.T) {
 	testData := spogotoTestData{
+		tintsOnly("+", []int64{1, 2, 6, 2}, []int64{1, 2, 8}),
+		tintsOnly("*", []int64{1, 2, 6, 2}, []int64{1, 2, 12}),
+		tintsOnly("-", []int64{1, 2, 6, 2}, []int64{1, 2, 4}),
+		tintsOnly("/", []int64{1, 2, 6, 2}, []int64{1, 2, 3}),
+		tintsOnly("/", []int64{6, 0}, []int64{6, 0}),
+		tintsOnly("%", []int64{1, 2, 6, 2}, []int64{1, 2, 0}),
+		tintsOnly("%", []int64{6, 0}, []int64{6, 0}),
+		tintsOnly("min", []int64{1, 2, 6, 2}, []int64{1, 2, 2}),
+		tintsOnly("min", []int64{1, 2, 6, 8}, []int64{1, 2, 6}),
+		tintsOnly("max", []int64{1, 2, 6, 2}, []int64{1, 2, 6}),
+		tintsOnly("max", []int64{1, 2, 6, 8}, []int64{1, 2, 8}),
+
+		// Boolean Functions
 		{
 			">",
 			[]int64{1, 2, 6, 2}, []int64{1, 2},
@@ -74,6 +57,8 @@ func TestIntegerStackBooleanFunctions(t *testing.T) {
 			[]bool{}, []bool{false},
 			[]float64{}, []float64{},
 		},
+
+		// Conversion functions
 		{
 			"fromboolean",
 			[]int64{}, []int64{1},
@@ -92,21 +77,47 @@ func TestIntegerStackBooleanFunctions(t *testing.T) {
 			[]bool{}, []bool{},
 			[]float64{7.35}, []float64{},
 		},
+
+		// Empties
+		tnothingHappens("+"),
+		tnothingHappens("*"),
+		tnothingHappens("-"),
+		tnothingHappens("/"),
+		tnothingHappens("%"),
+		tnothingHappens("<"),
+		tnothingHappens("="),
+		tnothingHappens(">"),
+		tnothingHappens("min"),
+		tnothingHappens("max"),
+		tnothingHappens("fromboolean"),
+		tnothingHappens("fromfloat"),
 	}
 
 	for _, d := range testData {
-		i := NewInterpreter()
-		boolStack := NewDataStack(boolElements(d.boolsBefore), FunctionMap{})
-		floatStack := NewDataStack(float64Elements(d.floatsBefore), FunctionMap{})
-		i.RegisterStack("boolean", boolStack)
-		i.RegisterStack("float", floatStack)
+		Convey(tPrimaryMessage("integer", d), t, func() {
+			i := NewInterpreter()
+			boolStack := NewDataStack(boolElements(d.boolsBefore), FunctionMap{})
+			floatStack := NewDataStack(float64Elements(d.floatsBefore), FunctionMap{})
+			i.RegisterStack("boolean", boolStack)
+			i.RegisterStack("float", floatStack)
 
-		Convey(fmt.Sprintf("Call()ing '%s' with integer stack %v should result %v", d.fn, d.intsBefore, d.boolsAfter), t, func() {
 			s := NewIntegerStack(d.intsBefore)
-			s.Call(d.fn, i)
-			So(s.elements, ShouldResemble, int64Elements(d.intsAfter))
-			So(boolStack.elements, ShouldResemble, boolElements(d.boolsAfter))
-			So(floatStack.elements, ShouldResemble, float64Elements(d.floatsAfter))
+			Convey("It shouldn't panic", func() {
+				So(func() { s.Call(d.fn, i) }, ShouldNotPanic)
+
+				Convey(fmt.Sprintf("Integer elements should be %v", d.intsAfter), func() {
+					So(s.elements, ShouldResemble, int64Elements(d.intsAfter))
+				})
+
+				Convey(tBoolMessaging(d.boolsBefore, d.boolsAfter), func() {
+					So(boolStack.elements, ShouldResemble, boolElements(d.boolsAfter))
+				})
+				Convey(tFloatMessaging(d.floatsBefore, d.floatsAfter), func() {
+					So(floatStack.elements, ShouldResemble, float64Elements(d.floatsAfter))
+				})
+
+			})
+
 		})
 
 	}
@@ -128,30 +139,4 @@ func TestRandomInteger(t *testing.T) {
 		})
 
 	})
-}
-
-func TestEmptyIntegerStack(t *testing.T) {
-	i := NewInterpreter()
-	elements := []int64{}
-
-	functions := []string{
-		"+", "*", "-",
-		"/", "%", "min", "max",
-		"<", "=", ">",
-	}
-
-	for _, fn := range functions {
-		boolStack := NewDataStack(Elements{}, FunctionMap{})
-		floatStack := NewDataStack(Elements{}, FunctionMap{})
-		i.RegisterStack("boolean", boolStack)
-		i.RegisterStack("float", floatStack)
-
-		Convey(fmt.Sprintf("For empty stacks, Call()ing '%s' should not panic and do nothing", fn), t, func() {
-			s := NewIntegerStack(elements)
-			So(func() { s.Call(fn, i) }, ShouldNotPanic)
-			So(s.elements, ShouldResemble, int64Elements([]int64{}))
-			So(boolStack.elements, ShouldResemble, boolElements([]bool{}))
-			So(floatStack.elements, ShouldResemble, float64Elements([]float64{}))
-		})
-	}
 }
