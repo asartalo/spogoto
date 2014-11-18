@@ -58,7 +58,7 @@ func TestParser(t *testing.T) {
 		})
 
 		Convey("It will ignore unknown data stacks and functions", func() {
-			code := "foo.- fool.barz foo.bar"
+			code := "foo.- fool.bar foo.bar"
 			So(
 				parser.Parse(code), ShouldResemble,
 				[]Instruction{
