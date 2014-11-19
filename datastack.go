@@ -9,16 +9,20 @@ type DataStack interface {
 	Stack
 	Functions() FunctionMap
 	Call(string, Interpreter)
+	PushLiteral(string)
 }
+
+type ConversionFunc func(string) (Element, bool)
 
 type datastack struct {
 	stack
-	FunctionMap FunctionMap
+	FunctionMap    FunctionMap
+	ConversionFunc ConversionFunc
 }
 
 // NewDataStack is a constructor for datastack.
-func NewDataStack(elements Elements, functions FunctionMap) *datastack {
-	d := &datastack{stack{elements}, functions}
+func NewDataStack(elements Elements, functions FunctionMap, fn ConversionFunc) *datastack {
+	d := &datastack{stack{elements}, functions, fn}
 	addCommonFunctions(d)
 	return d
 }
@@ -90,6 +94,13 @@ func (s *datastack) Call(method string, i Interpreter) {
 	}
 }
 
+func (s *datastack) PushLiteral(sval string) {
+	el, ok := s.ConversionFunc(sval)
+	if ok {
+		s.Push(el)
+	}
+}
+
 // A NullDataStack is a DataStack that has nothing and does nothing.
 type NullDataStack struct {
 	datastack
@@ -103,4 +114,7 @@ func (s *NullDataStack) Functions() FunctionMap {
 // Call calls a method from the FunctionMap which in NullDataStack's case is nothing.
 func (s *NullDataStack) Call(method string, i Interpreter) {
 	// Does nothing
+}
+
+func (s *NullDataStack) PushLiteral(sval string) {
 }

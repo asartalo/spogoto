@@ -1,11 +1,18 @@
 package spogoto
 
+import (
+	"strconv"
+)
+
 func NewBooleanStack(bools []bool) *datastack {
 	elements := Elements{}
 	for _, v := range bools {
 		elements = append(elements, bool(v))
 	}
-	d := &datastack{stack{elements}, FunctionMap{}}
+	d := NewDataStack(elements, FunctionMap{}, func(str string) (Element, bool) {
+		val, err := strconv.ParseBool(str)
+		return Element(val), err == nil
+	})
 	addBooleanFunctions(d)
 	return d
 }

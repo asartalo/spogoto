@@ -1,11 +1,19 @@
 package spogoto
 
+import (
+	"strconv"
+)
+
 func NewIntegerStack(ints []int64) *datastack {
 	elements := Elements{}
 	for _, v := range ints {
 		elements = append(elements, int64(v))
 	}
-	d := &datastack{stack{elements}, FunctionMap{}}
+
+	d := NewDataStack(elements, FunctionMap{}, func(str string) (Element, bool) {
+		val, err := strconv.ParseInt(str, 10, 64)
+		return Element(val), err == nil
+	})
 	addIntegerFunctions(d)
 	return d
 }

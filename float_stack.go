@@ -2,6 +2,7 @@ package spogoto
 
 import (
 	"math"
+	"strconv"
 )
 
 func NewFloatStack(floats []float64) *datastack {
@@ -9,7 +10,10 @@ func NewFloatStack(floats []float64) *datastack {
 	for _, v := range floats {
 		elements = append(elements, float64(v))
 	}
-	d := &datastack{stack{elements}, FunctionMap{}}
+	d := NewDataStack(elements, FunctionMap{}, func(str string) (Element, bool) {
+		val, err := strconv.ParseFloat(str, 64)
+		return Element(val), err == nil
+	})
 	addFloatFunctions(d)
 	return d
 }

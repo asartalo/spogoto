@@ -96,8 +96,8 @@ func TestIntegerStackFunctions(t *testing.T) {
 	for _, d := range testData {
 		Convey(tPrimaryMessage("integer", d), t, func() {
 			i := NewInterpreter()
-			boolStack := NewDataStack(boolElements(d.boolsBefore), FunctionMap{})
-			floatStack := NewDataStack(float64Elements(d.floatsBefore), FunctionMap{})
+			boolStack := tGenericDataStack(boolElements(d.boolsBefore))
+			floatStack := tGenericDataStack(float64Elements(d.floatsBefore))
 			i.RegisterStack("boolean", boolStack)
 			i.RegisterStack("float", floatStack)
 
@@ -121,8 +121,8 @@ func TestIntegerStackFunctions(t *testing.T) {
 	}
 }
 
-func TestRandomInteger(t *testing.T) {
-	Convey("Given an empty datastack", t, func() {
+func TestIntegerOtherFeatures(t *testing.T) {
+	Convey("Given an empty integer stack", t, func() {
 		i := NewInterpreter()
 		s := NewIntegerStack([]int64{})
 
@@ -133,6 +133,18 @@ func TestRandomInteger(t *testing.T) {
 				val := s.Pop()
 				So(val, ShouldBeLessThan, 10)
 				So(val, ShouldBeGreaterThan, -1)
+			})
+		})
+
+		Convey("When pushing literals", func() {
+			Convey("It should push proper integer literal", func() {
+				s.PushLiteral("2")
+				So(s.Pop(), ShouldEqual, 2)
+			})
+
+			Convey("It should not push improper integer literal", func() {
+				s.PushLiteral("rrr")
+				So(s.Pop(), ShouldBeNil)
 			})
 		})
 

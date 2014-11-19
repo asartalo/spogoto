@@ -102,8 +102,8 @@ func TestFloatStackFunctions(t *testing.T) {
 		i := NewInterpreter()
 
 		Convey(tPrimaryMessage("boolean", d), t, func() {
-			boolStack := NewDataStack(boolElements(d.boolsBefore), FunctionMap{})
-			integerStack := NewDataStack(int64Elements(d.intsBefore), FunctionMap{})
+			boolStack := tGenericDataStack(boolElements(d.boolsBefore))
+			integerStack := tGenericDataStack(int64Elements(d.intsBefore))
 			i.RegisterStack("boolean", boolStack)
 			i.RegisterStack("integer", integerStack)
 
@@ -126,7 +126,7 @@ func TestFloatStackFunctions(t *testing.T) {
 	}
 }
 
-func TestRandomFloat(t *testing.T) {
+func TestOtherFloatStackFeatures(t *testing.T) {
 	Convey("Given an empty float datastack", t, func() {
 		i := NewInterpreter()
 		s := NewFloatStack([]float64{})
@@ -138,6 +138,18 @@ func TestRandomFloat(t *testing.T) {
 				val := s.Pop()
 				So(val, ShouldBeLessThan, 1.0)
 				So(val, ShouldBeGreaterThanOrEqualTo, 0)
+			})
+		})
+
+		Convey("When pushing literals", func() {
+			Convey("It should push proper float literal", func() {
+				s.PushLiteral("2.0")
+				So(s.Pop(), ShouldEqual, 2.0)
+			})
+
+			Convey("It should not push improper float literal", func() {
+				s.PushLiteral("rrr")
+				So(s.Pop(), ShouldBeNil)
 			})
 		})
 

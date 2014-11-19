@@ -8,16 +8,18 @@ import (
 func TestParser(t *testing.T) {
 	Convey("Given a parser", t, func() {
 		parser := NewParser()
-		parser.Functions["foo"] = map[string]bool{"bar": true, "baz": true, "+": true}
+		parser.RegisterFunction("foo", "bar")
+		parser.RegisterFunction("foo", "baz")
+		parser.RegisterFunction("foo", "+")
 
 		Convey("It can parse integer literals", func() {
 			code := "1 98 -27"
 			So(
 				parser.Parse(code), ShouldResemble,
-				[]Instruction{
-					Instruction{"integer", "1", ""},
-					Instruction{"integer", "98", ""},
-					Instruction{"integer", "-27", ""},
+				InstructionSet{
+					NewInstruction("integer", "1", ""),
+					NewInstruction("integer", "98", ""),
+					NewInstruction("integer", "-27", ""),
 				},
 			)
 		})
@@ -26,10 +28,10 @@ func TestParser(t *testing.T) {
 			code := "0.528 3.14 -0.189"
 			So(
 				parser.Parse(code), ShouldResemble,
-				[]Instruction{
-					Instruction{"float", "0.528", ""},
-					Instruction{"float", "3.14", ""},
-					Instruction{"float", "-0.189", ""},
+				InstructionSet{
+					NewInstruction("float", "0.528", ""),
+					NewInstruction("float", "3.14", ""),
+					NewInstruction("float", "-0.189", ""),
 				},
 			)
 		})
@@ -38,9 +40,9 @@ func TestParser(t *testing.T) {
 			code := "true false"
 			So(
 				parser.Parse(code), ShouldResemble,
-				[]Instruction{
-					Instruction{"boolean", "true", ""},
-					Instruction{"boolean", "false", ""},
+				InstructionSet{
+					NewInstruction("boolean", "true", ""),
+					NewInstruction("boolean", "false", ""),
 				},
 			)
 		})
@@ -49,10 +51,10 @@ func TestParser(t *testing.T) {
 			code := "foo.bar foo.baz foo.+"
 			So(
 				parser.Parse(code), ShouldResemble,
-				[]Instruction{
-					Instruction{"foo", "foo.bar", "bar"},
-					Instruction{"foo", "foo.baz", "baz"},
-					Instruction{"foo", "foo.+", "+"},
+				InstructionSet{
+					NewInstruction("foo", "foo.bar", "bar"),
+					NewInstruction("foo", "foo.baz", "baz"),
+					NewInstruction("foo", "foo.+", "+"),
 				},
 			)
 		})
@@ -61,8 +63,8 @@ func TestParser(t *testing.T) {
 			code := "foo.- fool.bar foo.bar"
 			So(
 				parser.Parse(code), ShouldResemble,
-				[]Instruction{
-					Instruction{"foo", "foo.bar", "bar"},
+				InstructionSet{
+					NewInstruction("foo", "foo.bar", "bar"),
 				},
 			)
 		})

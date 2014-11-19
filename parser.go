@@ -5,16 +5,30 @@ import (
 	"strings"
 )
 
+// Instruction is a unit of code signifying the type it operates on,
+// the value literal of the instruction, the function to call if present,
+// and the number of runs or executions that the instruction has been called.
 type Instruction struct {
 	Type     string
 	Value    string
 	Function string
+	Runs     int
 }
 
+// NewInstruction creates a new Instruction.
+func NewInstruction(t string, val string, fn string) Instruction {
+	return Instruction{t, val, fn, 0}
+}
+
+// InstructionSet is a list of Instructions.
+type InstructionSet []Instruction
+
+// Parser parses string codes into an InstructionSet.
 type Parser struct {
 	Functions map[string]map[string]bool
 }
 
+// FunctionRegistered returns true if a function of a type has been registered.
 func (p *Parser) FunctionRegistered(t string, fn string) bool {
 	funcs, ok := p.Functions[t]
 	if ok {
@@ -23,10 +37,11 @@ func (p *Parser) FunctionRegistered(t string, fn string) bool {
 	return false
 }
 
-func (p *Parser) Parse(code string) []Instruction {
+// Parse parses string into an InstructionSet.
+func (p *Parser) Parse(code string) InstructionSet {
 	re := regexp.MustCompile("\\s+")
 	raw := re.Split(code, -1)
-	i := []Instruction{}
+	i := InstructionSet{}
 	for _, item := range raw {
 		parsed := p.ParseItem(item)
 		if parsed.Type != "" {
@@ -36,6 +51,7 @@ func (p *Parser) Parse(code string) []Instruction {
 	return i
 }
 
+// ParseItem parses a single string instruction into an Instruciton.
 func (p *Parser) ParseItem(item string) Instruction {
 	var t string
 	var fn string
@@ -56,9 +72,20 @@ func (p *Parser) ParseItem(item string) Instruction {
 
 	}
 
-	return Instruction{t, item, fn}
+	return NewInstruction(t, item, fn)
 }
 
+func (p *Parser) RegisterFunction(t string, fn string) {
+	m, ok := p.Functions[t]
+	if !ok {
+		p.Functions[t] = map[string]bool{}
+		m = p.Functions[t]
+	}
+	m[fn] = true
+
+}
+
+// NewParser creates a new Parser.
 func NewParser() *Parser {
 	return &Parser{make(map[string]map[string]bool)}
 }

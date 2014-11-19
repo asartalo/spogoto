@@ -8,10 +8,8 @@ import (
 func TestInterpreter(t *testing.T) {
 	Convey("Given an interpreter", t, func() {
 		i := NewInterpreter()
-		d1 := NewDataStack(Elements{1, 2}, FunctionMap{})
-		// d2 := NewDataStack(Elements{}, FunctionMap{})
+		d1 := tGenericDataStack(Elements{1, 2})
 		i.RegisterStack("foo", d1)
-		// i.RegisterStack("bar", d2)
 
 		Convey("DataStacks are retrievable by name", func() {
 			So(i.Stack("foo"), ShouldEqual, d1)
@@ -57,5 +55,21 @@ func TestInterpreter(t *testing.T) {
 			So(i.RandFloat(), ShouldBeGreaterThanOrEqualTo, -0.0)
 		})
 
+		// Code
+		Convey("When provided with code.", func() {
+			code := "1 2 integer.+"
+
+			Convey("And Run()", func() {
+				i.Run(code)
+
+				Convey("The code will be executed", func() {
+					var result int64
+					So(func() { result = i.Stack("integer").Pop().(int64) }, ShouldNotPanic)
+					So(result, ShouldEqual, 3)
+				})
+			})
+		})
+
 	})
+
 }

@@ -136,3 +136,7 @@ func tFloatMessaging(before []float64, after []float64) (message string) {
 
 	return message
 }
+
+func tGenericDataStack(els Elements) *datastack {
+	return NewDataStack(els, FunctionMap{}, func(strVal string) (Element, bool) { return Element(strVal), false })
+}

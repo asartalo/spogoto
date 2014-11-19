@@ -14,10 +14,20 @@ func TestDataStack(t *testing.T) {
 		functions["foo"] = func(s DataStack, i Interpreter) {
 			s.Push("e")
 		}
-		s := NewDataStack(elements, functions)
+		cfunc := func(strVal string) (Element, bool) { return Element(strVal), strVal == "x" }
+		s := NewDataStack(elements, functions, cfunc)
 
 		Convey("FunctionMap() should return function map", func() {
 			So(s.Functions(), ShouldEqual, functions)
+		})
+
+		Convey("When PushLiteral() is called", func() {
+			s.PushLiteral("x")
+			s.PushLiteral("z")
+
+			Convey("Uses ConversionFunc to push acceptable values", func() {
+				So(s.Pop(), ShouldEqual, "x")
+			})
 		})
 
 		Convey("When a function is Call()ed", func() {
@@ -77,7 +87,7 @@ func TestDataStack(t *testing.T) {
 		})
 
 		Convey("And a registered integer stack with element 2", func() {
-			iStack := NewDataStack(Elements{int64(2)}, FunctionMap{})
+			iStack := tGenericDataStack(Elements{int64(2)})
 			i.RegisterStack("integer", iStack)
 
 			Convey("When 'shove' is Call()ed", func() {
@@ -119,10 +129,10 @@ func TestDataStack(t *testing.T) {
 	})
 
 	Convey("Given an empty datastack", t, func() {
-		s := NewDataStack(Elements{}, FunctionMap{})
+		s := tGenericDataStack(Elements{})
 
 		Convey("And a registered integer stack with no elements", func() {
-			iStack := NewDataStack(Elements{}, FunctionMap{})
+			iStack := tGenericDataStack(Elements{})
 			i.RegisterStack("integer", iStack)
 
 			Convey("A Call() to 'shove' must not panic", func() {

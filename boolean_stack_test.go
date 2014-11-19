@@ -63,8 +63,8 @@ func TestBooleanStackFunctions(t *testing.T) {
 		i := NewInterpreter()
 
 		Convey(tPrimaryMessage("boolean", d), t, func() {
-			integerStack := NewDataStack(int64Elements(d.intsBefore), FunctionMap{})
-			floatStack := NewDataStack(float64Elements(d.floatsBefore), FunctionMap{})
+			integerStack := tGenericDataStack(int64Elements(d.intsBefore))
+			floatStack := tGenericDataStack(float64Elements(d.floatsBefore))
 			i.RegisterStack("integer", integerStack)
 			i.RegisterStack("float", floatStack)
 
@@ -88,4 +88,23 @@ func TestBooleanStackFunctions(t *testing.T) {
 		})
 
 	}
+}
+
+func TestOtherBooleanStackFeatures(t *testing.T) {
+	Convey("Given an empty boolean stack", t, func() {
+		s := NewBooleanStack([]bool{})
+
+		Convey("When pushing literals", func() {
+			Convey("It should push proper boolean literal", func() {
+				s.PushLiteral("true")
+				So(s.Pop(), ShouldEqual, true)
+			})
+
+			Convey("It should not push improper boolean literal", func() {
+				s.PushLiteral("rrr")
+				So(s.Pop(), ShouldBeNil)
+			})
+		})
+
+	})
 }
