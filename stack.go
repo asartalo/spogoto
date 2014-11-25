@@ -19,6 +19,7 @@ type Stack interface {
 	Flush()
 	Rotate()
 	Dup()
+	Elements() Elements
 	Yank(idx int64)
 	YankDup(idx int64)
 	Shove(e Element, idx int64)
@@ -36,6 +37,10 @@ func NewStack(elements Elements) stack {
 // Size returns the number of elements in the stack.
 func (s *stack) Size() int64 {
 	return int64(len(s.elements))
+}
+
+func (s *stack) Elements() Elements {
+	return s.elements
 }
 
 // IsEmpty returns true if there are no elements on the stack.

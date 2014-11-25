@@ -16,6 +16,19 @@ type spogotoTestItem struct {
 
 type spogotoTestData []spogotoTestItem
 
+type spogotoCodeTestItem struct {
+	fn           string
+	intsBefore   []int64
+	intsAfter    []int64
+	boolsBefore  []bool
+	boolsAfter   []bool
+	floatsBefore []float64
+	floatsAfter  []float64
+	code         string
+}
+
+type spogotoCodeTestData []spogotoCodeTestItem
+
 func int64Elements(ints []int64) Elements {
 	elements := Elements{}
 	for _, v := range ints {

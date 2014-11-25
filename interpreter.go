@@ -14,29 +14,49 @@ type Interpreter interface {
 	RandFloat() float64
 }
 
+type Cursor struct {
+	Position int64
+}
+
 type interpreter struct {
-	DataStacks map[string]DataStack
-	Rand       *rand.Rand
-	Parser     *Parser
+	DataStacks     map[string]DataStack
+	Rand           *rand.Rand
+	Parser         *Parser
+	Cursor         Cursor
+	CursorCommands map[string]func(*interpreter)
 }
 
 func (i *interpreter) Run(code string) {
 	instructions := i.Parser.Parse(code)
-	for _, instruction := range instructions {
+	inCount := int64(len(instructions))
+	for i.Cursor.Position < inCount {
+		instruction := instructions[i.Cursor.Position]
 		t := instruction.Type
 		fn := instruction.Function
 		if t == "" {
 			// No type so noop
+			i.Cursor.Position++
 			continue
 		}
 
 		if fn == "" {
 			// Literal type
 			i.Stack(t).PushLiteral(instruction.Value)
+		} else if t == "cursor" {
+			i.CursorCommand(fn)
 		} else {
 			// It's calling a function
 			i.Stack(t).Call(fn, i)
 		}
+
+		i.Cursor.Position++
+	}
+}
+
+func (i *interpreter) CursorCommand(fn string) {
+	theFunc, ok := i.CursorCommands[fn]
+	if ok {
+		theFunc(i)
 	}
 }
 
@@ -98,7 +118,23 @@ func NewInterpreter() *interpreter {
 		},
 		Rand: rand.New(rand.NewSource(rand.Int63())),
 	}
+	addCursorCommands(i)
 	i.setupParser(p)
 
 	return i
+}
+
+func addCursorCommands(in *interpreter) {
+	commands := make(map[string]func(*interpreter))
+
+	commands["skipif"] = func(i *interpreter) {
+		if i.Bad("boolean", 1) {
+			return
+		}
+		if i.Stack("boolean").Pop().(bool) {
+			i.Cursor.Position++
+		}
+	}
+
+	in.CursorCommands = commands
 }
