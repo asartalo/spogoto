@@ -15,7 +15,8 @@ type Interpreter interface {
 }
 
 type Cursor struct {
-	Position int64
+	Position     int64
+	Instructions InstructionSet
 }
 
 type interpreter struct {
@@ -29,6 +30,7 @@ type interpreter struct {
 func (i *interpreter) Run(code string) {
 	instructions := i.Parser.Parse(code)
 	inCount := int64(len(instructions))
+	i.Cursor.Instructions = instructions
 	for i.Cursor.Position < inCount {
 		instruction := instructions[i.Cursor.Position]
 		t := instruction.Type
@@ -133,6 +135,19 @@ func addCursorCommands(in *interpreter) {
 		}
 		if i.Stack("boolean").Pop().(bool) {
 			i.Cursor.Position++
+		}
+	}
+
+	commands["end"] = func(i *interpreter) {
+		i.Cursor.Position = int64(len(i.Cursor.Instructions))
+	}
+
+	commands["endif"] = func(i *interpreter) {
+		if i.Bad("boolean", 1) {
+			return
+		}
+		if i.Stack("boolean").Pop().(bool) {
+			i.Cursor.Position = int64(len(i.Cursor.Instructions))
 		}
 	}
 

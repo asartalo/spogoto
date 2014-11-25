@@ -17,14 +17,15 @@ type spogotoTestItem struct {
 type spogotoTestData []spogotoTestItem
 
 type spogotoCodeTestItem struct {
-	fn           string
+	toTest       string
+	code         string
+	expectation  string
 	intsBefore   []int64
 	intsAfter    []int64
 	boolsBefore  []bool
 	boolsAfter   []bool
 	floatsBefore []float64
 	floatsAfter  []float64
-	code         string
 }
 
 type spogotoCodeTestData []spogotoCodeTestItem

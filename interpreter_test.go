@@ -79,31 +79,66 @@ func TestCursorFunctions(t *testing.T) {
 	testData := spogotoCodeTestData{
 		{
 			"Skipif with true",
+			"1 true c.skipif 2",
+			"Should skip next instruction",
 			[]int64{}, []int64{1},
 			[]bool{}, []bool{},
 			[]float64{}, []float64{},
-			"1 true c.skipif 2",
 		},
 		{
 			"Skipif with false",
+			"1 false c.skipif 2",
+			"Will not skip next instruction",
 			[]int64{}, []int64{1, 2},
 			[]bool{}, []bool{},
 			[]float64{}, []float64{},
-			"1 false c.skipif 2",
 		},
 		{
 			"Skipif with empty boolean",
+			"1 c.skipif 2",
+			"Will do nothing",
 			[]int64{}, []int64{1, 2},
 			[]bool{}, []bool{},
 			[]float64{}, []float64{},
-			"1 c.skipif 2",
+		},
+		{
+			"End",
+			"1 c.end 2 3 4",
+			"Will terminate code and ignore subsequent instructions",
+			[]int64{}, []int64{1},
+			[]bool{}, []bool{},
+			[]float64{}, []float64{},
+		},
+		{
+			"Endif with true",
+			"1 true c.endif 2 3 4",
+			"Will terminate code and ignore subsequent instructions",
+			[]int64{}, []int64{1},
+			[]bool{}, []bool{},
+			[]float64{}, []float64{},
+		},
+		{
+			"Endif with false",
+			"1 false c.endif 2 3 4",
+			"Will not terminate code",
+			[]int64{}, []int64{1, 2, 3, 4},
+			[]bool{}, []bool{},
+			[]float64{}, []float64{},
+		},
+		{
+			"Endif with empty boolean stack",
+			"1 c.endif 2 3 4",
+			"Will do nothing",
+			[]int64{}, []int64{1, 2, 3, 4},
+			[]bool{}, []bool{},
+			[]float64{}, []float64{},
 		},
 	}
 	for _, d := range testData {
-		Convey(fmt.Sprintf("%s on code `%s`", d.fn, d.code), t, func() {
+		Convey(fmt.Sprintf("%s on code `%s`", d.toTest, d.code), t, func() {
 			i := NewInterpreter()
 
-			Convey("It shouldn't panic", func() {
+			Convey(d.expectation, func() {
 				So(func() { i.Run(d.code) }, ShouldNotPanic)
 				So(i.Stack("integer").Elements(), ShouldResemble, int64Elements(d.intsAfter))
 				So(i.Stack("boolean").Elements(), ShouldResemble, boolElements(d.boolsAfter))
