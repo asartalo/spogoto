@@ -58,15 +58,19 @@ func TestInterpreter(t *testing.T) {
 
 		// Code
 		Convey("When provided with code.", func() {
-			code := "1 2 integer.+"
+			code := "5 8 integer.+"
 
 			Convey("And Run()", func() {
-				i.Run(code)
+				result := i.Run(code)
 
 				Convey("The code will be executed", func() {
-					var result int64
-					So(func() { result = i.Stack("integer").Pop().(int64) }, ShouldNotPanic)
-					So(result, ShouldEqual, 3)
+					var value int64
+					So(func() { value = i.Stack("integer").Pop().(int64) }, ShouldNotPanic)
+					So(value, ShouldEqual, 13)
+				})
+
+				Convey("The result has the number of instructions executed", func() {
+					So(result.InstructionCount, ShouldEqual, 3)
 				})
 			})
 		})
@@ -79,25 +83,25 @@ func TestCursorFunctions(t *testing.T) {
 	testData := spogotoCodeTestData{
 		{
 			"Skipif with true",
-			"1 true c.skipif 2",
+			"1 true c.skipif 2 3",
 			"Should skip next instruction",
-			[]int64{}, []int64{1},
+			[]int64{}, []int64{1, 3},
 			[]bool{}, []bool{},
 			[]float64{}, []float64{},
 		},
 		{
 			"Skipif with false",
-			"1 false c.skipif 2",
+			"1 false c.skipif 2 3",
 			"Will not skip next instruction",
-			[]int64{}, []int64{1, 2},
+			[]int64{}, []int64{1, 2, 3},
 			[]bool{}, []bool{},
 			[]float64{}, []float64{},
 		},
 		{
 			"Skipif with empty boolean",
-			"1 c.skipif 2",
+			"1 c.skipif 2 3",
 			"Will do nothing",
-			[]int64{}, []int64{1, 2},
+			[]int64{}, []int64{1, 2, 3},
 			[]bool{}, []bool{},
 			[]float64{}, []float64{},
 		},

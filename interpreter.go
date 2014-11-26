@@ -19,6 +19,10 @@ type Cursor struct {
 	Instructions InstructionSet
 }
 
+type Result struct {
+	InstructionCount int64
+}
+
 type interpreter struct {
 	DataStacks     map[string]DataStack
 	Rand           *rand.Rand
@@ -27,7 +31,7 @@ type interpreter struct {
 	CursorCommands map[string]func(*interpreter)
 }
 
-func (i *interpreter) Run(code string) {
+func (i *interpreter) Run(code string) (result Result) {
 	instructions := i.Parser.Parse(code)
 	inCount := int64(len(instructions))
 	i.Cursor.Instructions = instructions
@@ -52,7 +56,10 @@ func (i *interpreter) Run(code string) {
 		}
 
 		i.Cursor.Position++
+		result.InstructionCount++
 	}
+
+	return result
 }
 
 func (i *interpreter) CursorCommand(fn string) {
