@@ -96,14 +96,15 @@ func TestIntegerStackFunctions(t *testing.T) {
 	for _, d := range testData {
 		Convey(tPrimaryMessage("integer", d), t, func() {
 			i := NewInterpreter()
+			r := NewRunSet(i)
 			boolStack := tGenericDataStack(boolElements(d.boolsBefore))
 			floatStack := tGenericDataStack(float64Elements(d.floatsBefore))
-			i.RegisterStack("boolean", boolStack)
-			i.RegisterStack("float", floatStack)
+			r.RegisterStack("boolean", boolStack)
+			r.RegisterStack("float", floatStack)
 
 			s := NewIntegerStack(d.intsBefore)
 			Convey("It shouldn't panic", func() {
-				So(func() { s.Call(d.fn, i) }, ShouldNotPanic)
+				So(func() { s.Call(d.fn, r, i) }, ShouldNotPanic)
 
 				Convey(fmt.Sprintf("Integer elements should be %v", d.intsAfter), func() {
 					So(s.elements, ShouldResemble, int64Elements(d.intsAfter))
@@ -124,10 +125,11 @@ func TestIntegerStackFunctions(t *testing.T) {
 func TestIntegerOtherFeatures(t *testing.T) {
 	Convey("Given an empty integer stack", t, func() {
 		i := NewInterpreter()
+		r := NewRunSet(i)
 		s := NewIntegerStack([]int64{})
 
 		Convey("When 'rand' is Call()ed", func() {
-			s.Call("rand", i)
+			s.Call("rand", r, i)
 
 			Convey("It should generate a random integer from 0 to 9", func() {
 				val := s.Pop()

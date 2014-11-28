@@ -19,7 +19,7 @@ func NewBooleanStack(bools []bool) *datastack {
 
 func addBooleanFunctions(ds *datastack) {
 
-	ds.FunctionMap["="] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["="] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) {
 			return
 		}
@@ -27,7 +27,7 @@ func addBooleanFunctions(ds *datastack) {
 		d.Push(d.Pop().(bool) == d.Pop().(bool))
 	}
 
-	ds.FunctionMap["and"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["and"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) {
 			return
 		}
@@ -37,7 +37,7 @@ func addBooleanFunctions(ds *datastack) {
 		d.Push(b1 && b2)
 	}
 
-	ds.FunctionMap["or"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["or"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) {
 			return
 		}
@@ -47,7 +47,7 @@ func addBooleanFunctions(ds *datastack) {
 		d.Push(b1 || b2)
 	}
 
-	ds.FunctionMap["xor"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["xor"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) {
 			return
 		}
@@ -57,7 +57,7 @@ func addBooleanFunctions(ds *datastack) {
 		d.Push(b1 != b2)
 	}
 
-	ds.FunctionMap["not"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["not"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(1) {
 			return
 		}
@@ -65,20 +65,20 @@ func addBooleanFunctions(ds *datastack) {
 		d.Push(!d.Pop().(bool))
 	}
 
-	ds.FunctionMap["frominteger"] = func(d DataStack, i Interpreter) {
-		if i.Bad("integer", 1) {
+	ds.FunctionMap["frominteger"] = func(d DataStack, r RunSet, i Interpreter) {
+		if r.Bad("integer", 1) {
 			return
 		}
 
-		d.Push(i.Stack("integer").Pop().(int64) != 0)
+		d.Push(r.Stack("integer").Pop().(int64) != 0)
 	}
 
-	ds.FunctionMap["fromfloat"] = func(d DataStack, i Interpreter) {
-		if i.Bad("float", 1) {
+	ds.FunctionMap["fromfloat"] = func(d DataStack, r RunSet, i Interpreter) {
+		if r.Bad("float", 1) {
 			return
 		}
 
-		d.Push(i.Stack("float").Pop().(float64) != 0.0)
+		d.Push(r.Stack("float").Pop().(float64) != 0.0)
 	}
 
 }

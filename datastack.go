@@ -1,6 +1,6 @@
 package spogoto
 
-type FunctionMap map[string]func(DataStack, Interpreter)
+type FunctionMap map[string]func(DataStack, RunSet, Interpreter)
 
 // DataStack is a Stack used by the Interpreter
 // to store data and has functions that can manipulate
@@ -8,7 +8,7 @@ type FunctionMap map[string]func(DataStack, Interpreter)
 type DataStack interface {
 	Stack
 	Functions() FunctionMap
-	Call(string, Interpreter)
+	Call(string, RunSet, Interpreter)
 	PushLiteral(string)
 }
 
@@ -29,54 +29,54 @@ func NewDataStack(elements Elements, functions FunctionMap, fn ConversionFunc) *
 
 func addCommonFunctions(ds *datastack) {
 
-	ds.FunctionMap["pop"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["pop"] = func(d DataStack, r RunSet, i Interpreter) {
 		d.Pop()
 	}
 
-	ds.FunctionMap["swap"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["swap"] = func(d DataStack, r RunSet, i Interpreter) {
 		d.Swap()
 	}
 
-	ds.FunctionMap["rotate"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["rotate"] = func(d DataStack, r RunSet, i Interpreter) {
 		d.Rotate()
 	}
 
-	ds.FunctionMap["shove"] = func(d DataStack, i Interpreter) {
-		if i.Bad("integer", 1) {
+	ds.FunctionMap["shove"] = func(d DataStack, r RunSet, i Interpreter) {
+		if r.Bad("integer", 1) {
 			return
 		}
 
-		idx := i.Stack("integer").Pop().(int64)
+		idx := r.Stack("integer").Pop().(int64)
 		d.Shove(d.Pop(), idx)
 	}
 
-	ds.FunctionMap["yank"] = func(d DataStack, i Interpreter) {
-		if i.Bad("integer", 1) {
+	ds.FunctionMap["yank"] = func(d DataStack, r RunSet, i Interpreter) {
+		if r.Bad("integer", 1) {
 			return
 		}
 
-		idx := i.Stack("integer").Pop().(int64)
+		idx := r.Stack("integer").Pop().(int64)
 		d.Yank(idx)
 	}
 
-	ds.FunctionMap["yankdup"] = func(d DataStack, i Interpreter) {
-		if i.Bad("integer", 1) {
+	ds.FunctionMap["yankdup"] = func(d DataStack, r RunSet, i Interpreter) {
+		if r.Bad("integer", 1) {
 			return
 		}
 
-		idx := i.Stack("integer").Pop().(int64)
+		idx := r.Stack("integer").Pop().(int64)
 		d.YankDup(idx)
 	}
 
-	ds.FunctionMap["stackdepth"] = func(d DataStack, i Interpreter) {
-		i.Stack("integer").Push(d.Size())
+	ds.FunctionMap["stackdepth"] = func(d DataStack, r RunSet, i Interpreter) {
+		r.Stack("integer").Push(d.Size())
 	}
 
-	ds.FunctionMap["flush"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["flush"] = func(d DataStack, r RunSet, i Interpreter) {
 		d.Flush()
 	}
 
-	ds.FunctionMap["dup"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["dup"] = func(d DataStack, r RunSet, i Interpreter) {
 		d.Dup()
 	}
 }
@@ -87,10 +87,10 @@ func (s *datastack) Functions() FunctionMap {
 }
 
 // Call calls a method from the FunctionMap
-func (s *datastack) Call(method string, i Interpreter) {
+func (s *datastack) Call(method string, r RunSet, i Interpreter) {
 	fn, ok := s.FunctionMap[method]
 	if ok {
-		fn(s, i)
+		fn(s, r, i)
 	}
 }
 
@@ -112,7 +112,7 @@ func (s *NullDataStack) Functions() FunctionMap {
 }
 
 // Call calls a method from the FunctionMap which in NullDataStack's case is nothing.
-func (s *NullDataStack) Call(method string, i Interpreter) {
+func (s *NullDataStack) Call(method string, r RunSet, i Interpreter) {
 	// Does nothing
 }
 

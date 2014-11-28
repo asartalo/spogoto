@@ -19,7 +19,7 @@ func NewIntegerStack(ints []int64) *datastack {
 }
 
 func addIntegerFunctions(ds *datastack) {
-	ds.FunctionMap["+"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["+"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) {
 			return
 		}
@@ -28,7 +28,7 @@ func addIntegerFunctions(ds *datastack) {
 		d.Push(s)
 	}
 
-	ds.FunctionMap["*"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["*"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) {
 			return
 		}
@@ -37,7 +37,7 @@ func addIntegerFunctions(ds *datastack) {
 		d.Push(s)
 	}
 
-	ds.FunctionMap["-"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["-"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) {
 			return
 		}
@@ -45,7 +45,7 @@ func addIntegerFunctions(ds *datastack) {
 		d.Push(-d.Pop().(int64) + d.Pop().(int64))
 	}
 
-	ds.FunctionMap["/"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["/"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) || d.Peek().(int64) == 0 {
 			return
 		}
@@ -56,7 +56,7 @@ func addIntegerFunctions(ds *datastack) {
 		d.Push(i2 / i1)
 	}
 
-	ds.FunctionMap["%"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["%"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) || d.Peek().(int64) == 0 {
 			return
 		}
@@ -67,7 +67,7 @@ func addIntegerFunctions(ds *datastack) {
 		d.Push(i2 % i1)
 	}
 
-	ds.FunctionMap["min"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["min"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) {
 			return
 		}
@@ -82,7 +82,7 @@ func addIntegerFunctions(ds *datastack) {
 		}
 	}
 
-	ds.FunctionMap["max"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["max"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) {
 			return
 		}
@@ -97,7 +97,7 @@ func addIntegerFunctions(ds *datastack) {
 		}
 	}
 
-	ds.FunctionMap[">"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap[">"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) {
 			return
 		}
@@ -105,10 +105,10 @@ func addIntegerFunctions(ds *datastack) {
 		i1 := d.Pop().(int64)
 		i2 := d.Pop().(int64)
 
-		i.Stack("boolean").Push(i2 > i1)
+		r.Stack("boolean").Push(i2 > i1)
 	}
 
-	ds.FunctionMap["<"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["<"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) {
 			return
 		}
@@ -116,23 +116,23 @@ func addIntegerFunctions(ds *datastack) {
 		i1 := d.Pop().(int64)
 		i2 := d.Pop().(int64)
 
-		i.Stack("boolean").Push(i2 < i1)
+		r.Stack("boolean").Push(i2 < i1)
 	}
 
-	ds.FunctionMap["="] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["="] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) {
 			return
 		}
 
-		i.Stack("boolean").Push(d.Pop().(int64) == d.Pop().(int64))
+		r.Stack("boolean").Push(d.Pop().(int64) == d.Pop().(int64))
 	}
 
-	ds.FunctionMap["fromboolean"] = func(d DataStack, i Interpreter) {
-		if i.Bad("boolean", 1) {
+	ds.FunctionMap["fromboolean"] = func(d DataStack, r RunSet, i Interpreter) {
+		if r.Bad("boolean", 1) {
 			return
 		}
 
-		b := i.Stack("boolean").Pop().(bool)
+		b := r.Stack("boolean").Pop().(bool)
 		if b {
 			d.Push(int64(1))
 		} else {
@@ -140,16 +140,16 @@ func addIntegerFunctions(ds *datastack) {
 		}
 	}
 
-	ds.FunctionMap["fromfloat"] = func(d DataStack, i Interpreter) {
-		if i.Bad("float", 1) {
+	ds.FunctionMap["fromfloat"] = func(d DataStack, r RunSet, i Interpreter) {
+		if r.Bad("float", 1) {
 			return
 		}
 
-		f := i.Stack("float").Pop().(float64)
+		f := r.Stack("float").Pop().(float64)
 		d.Push(int64(f))
 	}
 
-	ds.FunctionMap["rand"] = func(d DataStack, i Interpreter) {
+	ds.FunctionMap["rand"] = func(d DataStack, r RunSet, i Interpreter) {
 		d.Push(i.RandInt())
 	}
 

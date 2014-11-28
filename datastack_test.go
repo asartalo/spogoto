@@ -7,11 +7,12 @@ import (
 
 func TestDataStack(t *testing.T) {
 	i := NewInterpreter()
+	r := NewRunSet(i)
 
 	Convey("Given a stack with 4 elements and a function definition", t, func() {
 		elements := Elements{"a", "b", "c", "d"}
 		functions := make(FunctionMap)
-		functions["foo"] = func(s DataStack, i Interpreter) {
+		functions["foo"] = func(s DataStack, r RunSet, i Interpreter) {
 			s.Push("e")
 		}
 		cfunc := func(strVal string) (Element, bool) { return Element(strVal), strVal == "x" }
@@ -31,7 +32,7 @@ func TestDataStack(t *testing.T) {
 		})
 
 		Convey("When a function is Call()ed", func() {
-			s.Call("foo", i)
+			s.Call("foo", r, i)
 
 			Convey("It should execute the function", func() {
 				So(s.Peek(), ShouldEqual, "e")
@@ -39,11 +40,11 @@ func TestDataStack(t *testing.T) {
 		})
 
 		Convey("It should not panic when a non-existent function is Call()ed", func() {
-			So(func() { s.Call("bar", i) }, ShouldNotPanic)
+			So(func() { s.Call("bar", r, i) }, ShouldNotPanic)
 		})
 
 		Convey("When 'pop' is Call()ed", func() {
-			s.Call("pop", i)
+			s.Call("pop", r, i)
 
 			Convey("It should remove the top element of the stack", func() {
 				So(s.Peek(), ShouldEqual, "c")
@@ -52,7 +53,7 @@ func TestDataStack(t *testing.T) {
 		})
 
 		Convey("When 'swap' is Call()ed", func() {
-			s.Call("swap", i)
+			s.Call("swap", r, i)
 			Convey("It should swap the positions of the top two elements", func() {
 				So(s.Pop(), ShouldEqual, "c")
 				So(s.Pop(), ShouldEqual, "d")
@@ -60,7 +61,7 @@ func TestDataStack(t *testing.T) {
 		})
 
 		Convey("When 'dup' is Call()ed", func() {
-			s.Call("dup", i)
+			s.Call("dup", r, i)
 			Convey("It should duplicate the top element", func() {
 				So(s.Size(), ShouldEqual, 5)
 				So(s.Pop(), ShouldEqual, "d")
@@ -69,7 +70,7 @@ func TestDataStack(t *testing.T) {
 		})
 
 		Convey("When 'rotate' is Call()ed", func() {
-			s.Call("rotate", i)
+			s.Call("rotate", r, i)
 
 			Convey("It should rotate the top 3 values on the stack", func() {
 				So(s.Pop(), ShouldEqual, "b")
@@ -79,7 +80,7 @@ func TestDataStack(t *testing.T) {
 		})
 
 		Convey("When 'flush' is Call()ed", func() {
-			s.Call("flush", i)
+			s.Call("flush", r, i)
 
 			Convey("It should empty the stack", func() {
 				So(s.Size(), ShouldEqual, 0)
@@ -88,10 +89,10 @@ func TestDataStack(t *testing.T) {
 
 		Convey("And a registered integer stack with element 2", func() {
 			iStack := tGenericDataStack(Elements{int64(2)})
-			i.RegisterStack("integer", iStack)
+			r.RegisterStack("integer", iStack)
 
 			Convey("When 'shove' is Call()ed", func() {
-				s.Call("shove", i)
+				s.Call("shove", r, i)
 
 				Convey("It should shove the top most element to the 2 position", func() {
 					So(s.Pop(), ShouldEqual, "c")
@@ -101,7 +102,7 @@ func TestDataStack(t *testing.T) {
 			})
 
 			Convey("When 'yank' is Call()ed", func() {
-				s.Call("yank", i)
+				s.Call("yank", r, i)
 
 				Convey("It pulls the 2nd element off the stack and places it on top", func() {
 					So(s.Pop(), ShouldEqual, "b")
@@ -109,7 +110,7 @@ func TestDataStack(t *testing.T) {
 			})
 
 			Convey("When 'yankdup' is Call()ed", func() {
-				s.Call("yankdup", i)
+				s.Call("yankdup", r, i)
 
 				Convey("It copies the 2nd element stack and places the copy on top", func() {
 					So(s.Size(), ShouldEqual, 5)
@@ -118,7 +119,7 @@ func TestDataStack(t *testing.T) {
 			})
 
 			Convey("When 'stackdepth' is Call()ed", func() {
-				s.Call("stackdepth", i)
+				s.Call("stackdepth", r, i)
 
 				Convey("It should push the size of the stack to the integer stack", func() {
 					So(iStack.Pop(), ShouldEqual, 4)
@@ -133,18 +134,18 @@ func TestDataStack(t *testing.T) {
 
 		Convey("And a registered integer stack with no elements", func() {
 			iStack := tGenericDataStack(Elements{})
-			i.RegisterStack("integer", iStack)
+			r.RegisterStack("integer", iStack)
 
 			Convey("A Call() to 'shove' must not panic", func() {
-				So(func() { s.Call("shove", i) }, ShouldNotPanic)
+				So(func() { s.Call("shove", r, i) }, ShouldNotPanic)
 			})
 
 			Convey("A Call() to 'yank' must not panic", func() {
-				So(func() { s.Call("yank", i) }, ShouldNotPanic)
+				So(func() { s.Call("yank", r, i) }, ShouldNotPanic)
 			})
 
 			Convey("A Call() to 'yankdup' must not panic", func() {
-				So(func() { s.Call("yankdup", i) }, ShouldNotPanic)
+				So(func() { s.Call("yankdup", r, i) }, ShouldNotPanic)
 			})
 
 		})

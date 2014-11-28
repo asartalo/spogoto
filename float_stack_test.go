@@ -100,16 +100,17 @@ func TestFloatStackFunctions(t *testing.T) {
 
 	for _, d := range testData {
 		i := NewInterpreter()
+		r := NewRunSet(i)
 
 		Convey(tPrimaryMessage("boolean", d), t, func() {
 			boolStack := tGenericDataStack(boolElements(d.boolsBefore))
 			integerStack := tGenericDataStack(int64Elements(d.intsBefore))
-			i.RegisterStack("boolean", boolStack)
-			i.RegisterStack("integer", integerStack)
+			r.RegisterStack("boolean", boolStack)
+			r.RegisterStack("integer", integerStack)
 
 			s := NewFloatStack(d.floatsBefore)
 			Convey("It shouldn't panic", func() {
-				So(func() { s.Call(d.fn, i) }, ShouldNotPanic)
+				So(func() { s.Call(d.fn, r, i) }, ShouldNotPanic)
 
 				Convey(fmt.Sprintf("Float elements should be %v", d.floatsAfter), func() {
 					So(s.elements, ShouldResemble, float64Elements(d.floatsAfter))
@@ -129,10 +130,11 @@ func TestFloatStackFunctions(t *testing.T) {
 func TestOtherFloatStackFeatures(t *testing.T) {
 	Convey("Given an empty float datastack", t, func() {
 		i := NewInterpreter()
+		r := NewRunSet(i)
 		s := NewFloatStack([]float64{})
 
 		Convey("When 'rand' is Call()ed", func() {
-			s.Call("rand", i)
+			s.Call("rand", r, i)
 
 			Convey("It should generate a random float number", func() {
 				val := s.Pop()
