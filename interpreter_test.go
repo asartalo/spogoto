@@ -84,7 +84,7 @@ func TestCursorFunctions(t *testing.T) {
 	testData := spogotoCodeTestData{
 		{
 			"Skipif with true",
-			"1 true c.skipif 2 3",
+			"1 true cursor.skipif 2 3",
 			"Should skip next instruction",
 			[]int64{}, []int64{1, 3},
 			[]bool{}, []bool{},
@@ -92,7 +92,7 @@ func TestCursorFunctions(t *testing.T) {
 		},
 		{
 			"Skipif with false",
-			"1 false c.skipif 2 3",
+			"1 false cursor.skipif 2 3",
 			"Will not skip next instruction",
 			[]int64{}, []int64{1, 2, 3},
 			[]bool{}, []bool{},
@@ -100,7 +100,7 @@ func TestCursorFunctions(t *testing.T) {
 		},
 		{
 			"Skipif with empty boolean",
-			"1 c.skipif 2 3",
+			"1 cursor.skipif 2 3",
 			"Will do nothing",
 			[]int64{}, []int64{1, 2, 3},
 			[]bool{}, []bool{},
@@ -108,7 +108,7 @@ func TestCursorFunctions(t *testing.T) {
 		},
 		{
 			"End",
-			"1 c.end 2 3 4",
+			"1 cursor.end 2 3 4",
 			"Will terminate code and ignore subsequent instructions",
 			[]int64{}, []int64{1},
 			[]bool{}, []bool{},
@@ -116,7 +116,7 @@ func TestCursorFunctions(t *testing.T) {
 		},
 		{
 			"Endif with true",
-			"1 true c.endif 2 3 4",
+			"1 true cursor.endif 2 3 4",
 			"Will terminate code and ignore subsequent instructions",
 			[]int64{}, []int64{1},
 			[]bool{}, []bool{},
@@ -124,7 +124,7 @@ func TestCursorFunctions(t *testing.T) {
 		},
 		{
 			"Endif with false",
-			"1 false c.endif 2 3 4",
+			"1 false cursor.endif 2 3 4",
 			"Will not terminate code",
 			[]int64{}, []int64{1, 2, 3, 4},
 			[]bool{}, []bool{},
@@ -132,7 +132,7 @@ func TestCursorFunctions(t *testing.T) {
 		},
 		{
 			"Endif with empty boolean stack",
-			"1 c.endif 2 3 4",
+			"1 cursor.endif 2 3 4",
 			"Will do nothing",
 			[]int64{}, []int64{1, 2, 3, 4},
 			[]bool{}, []bool{},

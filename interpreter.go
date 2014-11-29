@@ -11,40 +11,13 @@ type Interpreter interface {
 	Run(string) RunSet
 }
 
-type RunSet interface {
-	RegisterStack(string, DataStack)
-	Stack(string) DataStack
-	Ok(string, int64) bool
-	Bad(string, int64) bool
-	DataStacks() map[string]DataStack
-	Cursor() *Cursor
-	CursorCommand(string)
-	IncrementInstructionCount()
-	InstructionCount() int64
-}
-
-type Cursor struct {
-	Position     int64
-	Instructions InstructionSet
-}
-
 type interpreter struct {
 	Rand   *rand.Rand
 	Parser *Parser
 }
 
-type runset struct {
-	dataStacks       map[string]DataStack
-	cursor           Cursor
-	cursorCommands   map[string]func(RunSet)
-	instructionCount int64
-}
-
 func (i *interpreter) Run(code string) (r RunSet) {
 	r = i.createRunSet()
-	if i.Parser == nil {
-		i.setupParser(r)
-	}
 	instructions := i.Parser.Parse(code)
 	inCount := int64(len(instructions))
 	r.Cursor().Instructions = instructions
@@ -75,56 +48,6 @@ func (i *interpreter) Run(code string) (r RunSet) {
 	return r
 }
 
-func (r *runset) Cursor() *Cursor {
-	return &r.cursor
-}
-
-func (r *runset) IncrementInstructionCount() {
-	r.instructionCount++
-}
-
-func (r *runset) InstructionCount() int64 {
-	return r.instructionCount
-}
-
-func (r *runset) CursorCommand(fn string) {
-	theFunc, ok := r.cursorCommands[fn]
-	if ok {
-		theFunc(r)
-	}
-}
-
-// RegisterStack adds a stack to the available DataStacks identified by name.
-func (r *runset) RegisterStack(name string, stack DataStack) {
-	r.dataStacks[name] = stack
-}
-
-// Stack returns the stack registered with name.
-func (r *runset) Stack(name string) DataStack {
-	s, ok := r.dataStacks[name]
-	if !ok {
-		s = &NullDataStack{}
-	}
-
-	return s
-}
-
-// Ok returns true if stack is available and has the number of elements
-// required.
-func (r *runset) Ok(name string, count int64) bool {
-	return !r.Bad(name, count)
-}
-
-// Bad returns false if stack is available and has the number of elements
-// required.
-func (r *runset) Bad(name string, count int64) bool {
-	return r.Stack(name).Lack(count)
-}
-
-func (r *runset) DataStacks() map[string]DataStack {
-	return r.dataStacks
-}
-
 // RandInt generates a random integer between 0 and 9
 func (i *interpreter) RandInt() int64 {
 	return i.Rand.Int63n(10)
@@ -143,6 +66,10 @@ func (i *interpreter) setupParser(r RunSet) {
 		}
 	}
 
+	for fnc, _ := range r.CursorCommands() {
+		p.RegisterFunction("cursor", fnc)
+	}
+
 	i.Parser = p
 }
 
@@ -151,51 +78,11 @@ func NewInterpreter() *interpreter {
 	i := &interpreter{
 		Rand: rand.New(rand.NewSource(rand.Int63())),
 	}
+	i.setupParser(i.createRunSet())
 
 	return i
 }
 
-func NewRunSet(i Interpreter) *runset {
-	r := &runset{
-		dataStacks: map[string]DataStack{
-			"integer": NewIntegerStack([]int64{}),
-			"float":   NewFloatStack([]float64{}),
-			"boolean": NewBooleanStack([]bool{}),
-		},
-	}
-	addCursorCommands(r)
-
-	return r
-}
-
 func (i *interpreter) createRunSet() *runset {
 	return NewRunSet(i)
-}
-
-func addCursorCommands(rs *runset) {
-	commands := make(map[string]func(RunSet))
-
-	commands["skipif"] = func(r RunSet) {
-		if r.Bad("boolean", 1) {
-			return
-		}
-		if r.Stack("boolean").Pop().(bool) {
-			r.Cursor().Position++
-		}
-	}
-
-	commands["end"] = func(r RunSet) {
-		r.Cursor().Position = int64(len(r.Cursor().Instructions))
-	}
-
-	commands["endif"] = func(r RunSet) {
-		if r.Bad("boolean", 1) {
-			return
-		}
-		if r.Stack("boolean").Pop().(bool) {
-			r.Cursor().Position = int64(len(r.Cursor().Instructions))
-		}
-	}
-
-	rs.cursorCommands = commands
 }

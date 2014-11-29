@@ -61,11 +61,6 @@ func (p *Parser) ParseItem(item string) Instruction {
 		t = "integer"
 	} else if regexp.MustCompile(`^\-?\d+\.\d+$`).MatchString(item) {
 		t = "float"
-	} else if regexp.MustCompile(`^c\.[^\.]+$`).MatchString(item) {
-		// Cursor function
-		t = "cursor"
-		s := strings.Split(item, ".")
-		fn = s[1]
 	} else if regexp.MustCompile(`^\w+\.[^\.]+$`).MatchString(item) {
 		s := strings.Split(item, ".")
 		t = s[0]
