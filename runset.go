@@ -94,6 +94,10 @@ func (r *runset) DataStacks() map[string]DataStack {
 	return r.dataStacks
 }
 
+func instructionCount(r RunSet) int64 {
+	return int64(len(r.Cursor().Instructions))
+}
+
 func addCursorCommands(rs *runset) {
 	commands := make(CursorCommands)
 
@@ -107,7 +111,7 @@ func addCursorCommands(rs *runset) {
 	}
 
 	commands["end"] = func(r RunSet) {
-		r.Cursor().Position = int64(len(r.Cursor().Instructions))
+		r.Cursor().Position = instructionCount(r)
 	}
 
 	commands["endif"] = func(r RunSet) {
@@ -115,7 +119,24 @@ func addCursorCommands(rs *runset) {
 			return
 		}
 		if r.Stack("boolean").Pop().(bool) {
-			r.Cursor().Position = int64(len(r.Cursor().Instructions))
+			commands["end"](r)
+		}
+	}
+
+	commands["goto"] = func(r RunSet) {
+		if r.Bad("integer", 1) {
+			return
+		}
+		pos := r.Stack("integer").Pop().(int64)
+		if pos < 0 || pos > instructionCount(r) {
+			return
+		}
+		r.Cursor().Position = int64(pos - 1)
+	}
+
+	commands["gotoif"] = func(r RunSet) {
+		if r.Ok("boolean", 1) && r.Stack("boolean").Pop().(bool) {
+			commands["goto"](r)
 		}
 	}
 

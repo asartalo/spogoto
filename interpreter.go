@@ -52,6 +52,9 @@ func (i *interpreter) Run(code string) (r RunSet) {
 
 		r.Cursor().Position++
 		r.IncrementInstructionCount()
+		if r.InstructionCount() > i.Options.MaxInstructions {
+			break
+		}
 	}
 
 	return r
