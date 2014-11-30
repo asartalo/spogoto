@@ -11,9 +11,18 @@ type Interpreter interface {
 	Run(string) RunSet
 }
 
+type Options struct {
+	MaxInstructions int64
+}
+
+var DefaultOptions = Options{
+	MaxInstructions: 100,
+}
+
 type interpreter struct {
-	Rand   *rand.Rand
-	Parser *Parser
+	Rand    *rand.Rand
+	Parser  *Parser
+	Options Options
 }
 
 func (i *interpreter) Run(code string) (r RunSet) {
@@ -74,9 +83,10 @@ func (i *interpreter) setupParser(r RunSet) {
 }
 
 // NewInterpreter constructs a new Intepreter.
-func NewInterpreterDefault() *interpreter {
+func NewInterpreter(options Options) *interpreter {
 	i := &interpreter{
-		Rand: rand.New(rand.NewSource(rand.Int63())),
+		Rand:    rand.New(rand.NewSource(rand.Int63())),
+		Options: options,
 	}
 	i.setupParser(i.createRunSet())
 

@@ -99,10 +99,9 @@ func TestFloatStackFunctions(t *testing.T) {
 	}
 
 	for _, d := range testData {
-		i := NewInterpreterDefault()
-		r := NewRunSet(i)
-
 		Convey(tPrimaryMessage("boolean", d), t, func() {
+			i := NewInterpreter(DefaultOptions)
+			r := NewRunSet(i)
 			boolStack := tGenericDataStack(boolElements(d.boolsBefore))
 			integerStack := tGenericDataStack(int64Elements(d.intsBefore))
 			r.RegisterStack("boolean", boolStack)
@@ -129,7 +128,7 @@ func TestFloatStackFunctions(t *testing.T) {
 
 func TestOtherFloatStackFeatures(t *testing.T) {
 	Convey("Given an empty float datastack", t, func() {
-		i := NewInterpreterDefault()
+		i := NewInterpreter(DefaultOptions)
 		r := NewRunSet(i)
 		s := NewFloatStack([]float64{})
 
