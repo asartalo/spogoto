@@ -26,6 +26,7 @@ type InstructionSet []Instruction
 // Parser parses string codes into an InstructionSet.
 type Parser struct {
 	Functions map[string]map[string]bool
+	symbols   []string
 }
 
 // FunctionRegistered returns true if a function of a type has been registered.
@@ -82,10 +83,15 @@ func (p *Parser) RegisterFunction(t string, fn string) {
 		m = p.Functions[t]
 	}
 	m[fn] = true
+	p.symbols = append(p.symbols, t+"."+fn)
 
+}
+
+func (p *Parser) Symbols() []string {
+	return p.symbols
 }
 
 // NewParser creates a new Parser.
 func NewParser() *Parser {
-	return &Parser{make(map[string]map[string]bool)}
+	return &Parser{make(map[string]map[string]bool), []string{}}
 }

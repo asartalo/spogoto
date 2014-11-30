@@ -11,6 +11,14 @@ func TestParser(t *testing.T) {
 		parser.RegisterFunction("foo", "bar")
 		parser.RegisterFunction("foo", "baz")
 		parser.RegisterFunction("foo", "+")
+		parser.RegisterFunction("zoo", "-")
+
+		Convey("It can return all possible symbols available", func() {
+			So(
+				parser.Symbols(), ShouldResemble,
+				[]string{"foo.bar", "foo.baz", "foo.+", "zoo.-"},
+			)
+		})
 
 		Convey("It can parse integer literals", func() {
 			code := "1 98 -27"
