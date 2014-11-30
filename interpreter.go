@@ -74,7 +74,7 @@ func (i *interpreter) setupParser(r RunSet) {
 }
 
 // NewInterpreter constructs a new Intepreter.
-func NewInterpreter() *interpreter {
+func NewInterpreterDefault() *interpreter {
 	i := &interpreter{
 		Rand: rand.New(rand.NewSource(rand.Int63())),
 	}

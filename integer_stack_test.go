@@ -95,7 +95,7 @@ func TestIntegerStackFunctions(t *testing.T) {
 
 	for _, d := range testData {
 		Convey(tPrimaryMessage("integer", d), t, func() {
-			i := NewInterpreter()
+			i := NewInterpreterDefault()
 			r := NewRunSet(i)
 			boolStack := tGenericDataStack(boolElements(d.boolsBefore))
 			floatStack := tGenericDataStack(float64Elements(d.floatsBefore))
@@ -124,7 +124,7 @@ func TestIntegerStackFunctions(t *testing.T) {
 
 func TestIntegerOtherFeatures(t *testing.T) {
 	Convey("Given an empty integer stack", t, func() {
-		i := NewInterpreter()
+		i := NewInterpreterDefault()
 		r := NewRunSet(i)
 		s := NewIntegerStack([]int64{})
 

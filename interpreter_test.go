@@ -8,7 +8,7 @@ import (
 
 func TestInterpreter(t *testing.T) {
 	Convey("Given an Interpreter and a RunSet", t, func() {
-		i := NewInterpreter()
+		i := NewInterpreterDefault()
 		r := NewRunSet(i)
 		d1 := tGenericDataStack(Elements{1, 2})
 		r.RegisterStack("foo", d1)
@@ -141,7 +141,7 @@ func TestCursorFunctions(t *testing.T) {
 	}
 	for _, d := range testData {
 		Convey(fmt.Sprintf("%s on code `%s`", d.toTest, d.code), t, func() {
-			i := NewInterpreter()
+			i := NewInterpreterDefault()
 			var r RunSet
 
 			Convey(d.expectation, func() {

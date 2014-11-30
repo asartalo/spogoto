@@ -60,7 +60,7 @@ func TestBooleanStackFunctions(t *testing.T) {
 	}
 
 	for _, d := range testData {
-		i := NewInterpreter()
+		i := NewInterpreterDefault()
 		r := NewRunSet(i)
 
 		Convey(tPrimaryMessage("boolean", d), t, func() {

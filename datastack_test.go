@@ -6,7 +6,7 @@ import (
 )
 
 func TestDataStack(t *testing.T) {
-	i := NewInterpreter()
+	i := NewInterpreterDefault()
 	r := NewRunSet(i)
 
 	Convey("Given a stack with 4 elements and a function definition", t, func() {
