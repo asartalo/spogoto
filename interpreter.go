@@ -3,6 +3,8 @@ package spogoto
 import (
 	"fmt"
 	"math/rand"
+	"strings"
+	"time"
 )
 
 // Interpreter interprets Spogoto code.
@@ -61,6 +63,16 @@ func (i *interpreter) Run(code string) (r RunSet) {
 	return r
 }
 
+func (i *interpreter) RandomCode(length int64) string {
+	var code []string
+	var k int64
+	for k = 0; k < length; k++ {
+		code = append(code, i.RandomInstruction())
+	}
+
+	return strings.Join(code, " ")
+}
+
 // RandInt generates a random integer between 0 and 9
 func (i *interpreter) RandInt() int64 {
 	return i.Rand.Int63n(10)
@@ -69,6 +81,14 @@ func (i *interpreter) RandInt() int64 {
 // RandFloat generates a random float number between 0 and 1
 func (i *interpreter) RandFloat() float64 {
 	return i.Rand.Float64()
+}
+
+func (i *interpreter) RandomInstruction() string {
+	if i.RandFloat() < 0.3 {
+		return i.RandomLiteral([]string{"integer", "float", "boolean"}[i.Rand.Int63n(3)])
+	} else {
+		return i.RandomSymbol()
+	}
 }
 
 // RandomLiteral
@@ -131,7 +151,7 @@ func (i *interpreter) setupParser(r RunSet) {
 // NewInterpreter constructs a new Intepreter.
 func NewInterpreter(options Options) *interpreter {
 	i := &interpreter{
-		Rand:    rand.New(rand.NewSource(rand.Int63())),
+		Rand:    rand.New(rand.NewSource(time.Now().UnixNano())),
 		Options: options,
 	}
 	i.setupParser(i.createRunSet())
