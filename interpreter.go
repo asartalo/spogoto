@@ -1,6 +1,7 @@
 package spogoto
 
 import (
+	"fmt"
 	"math/rand"
 )
 
@@ -68,6 +69,48 @@ func (i *interpreter) RandInt() int64 {
 // RandFloat generates a random float number between 0 and 1
 func (i *interpreter) RandFloat() float64 {
 	return i.Rand.Float64()
+}
+
+// RandomLiteral
+func (i *interpreter) RandomLiteral(t string) string {
+	switch t {
+	case "integer":
+		return i.randomInteger()
+	case "float":
+		return i.randomFloat()
+	default:
+		return i.randomBoolean()
+	}
+}
+
+func (i *interpreter) RandomSymbol() string {
+	symbols := i.Parser.Symbols()
+	idx := i.Rand.Int63n(int64(len(symbols)))
+	return symbols[idx]
+}
+
+func (i *interpreter) randomBoolean() string {
+	if i.RandFloat() > 0.5 {
+		return "true"
+	} else {
+		return "false"
+	}
+}
+
+func (i *interpreter) randomInteger() string {
+	var sign = ""
+	if i.RandFloat() > 0.5 {
+		sign = "-"
+	}
+	return fmt.Sprintf("%s%d", sign, i.RandInt())
+}
+
+func (i *interpreter) randomFloat() string {
+	var sign = ""
+	if i.RandFloat() > 0.5 {
+		sign = "-"
+	}
+	return fmt.Sprintf("%s%f", sign, i.RandFloat())
 }
 
 func (i *interpreter) setupParser(r RunSet) {

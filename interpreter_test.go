@@ -3,8 +3,23 @@ package spogoto
 import (
 	"fmt"
 	. "github.com/smartystreets/goconvey/convey"
+	"regexp"
 	"testing"
 )
+
+func ShouldMatch(actual interface{}, expected ...interface{}) string {
+	r, err := regexp.Compile(expected[0].(string))
+
+	if err != nil {
+		return err.Error()
+	}
+
+	if r.MatchString(actual.(string)) {
+		return ""
+	} else {
+		return fmt.Sprintf("String %s did not match pattern %s", actual, expected[0])
+	}
+}
 
 func TestInterpreter(t *testing.T) {
 	Convey("Given an Interpreter and a RunSet", t, func() {
@@ -74,6 +89,25 @@ func TestInterpreter(t *testing.T) {
 					So(result.InstructionCount(), ShouldEqual, 3)
 				})
 			})
+		})
+
+		Convey("Can generate random literals", func() {
+			data := []struct {
+				kind    string
+				matcher string
+			}{
+				{"boolean", `(true|false)`},
+				{"integer", `^-?\d+$`},
+				{"float", `^-?\d+\.\d+$`},
+			}
+
+			for _, d := range data {
+				So(i.RandomLiteral(d.kind), ShouldMatch, d.matcher)
+			}
+		})
+
+		Convey("Can generate random symbols", func() {
+			So(i.RandomSymbol(), ShouldMatch, `[a-z]+\.\S+`)
 		})
 
 	})
