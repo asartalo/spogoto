@@ -1,9 +1,11 @@
 package spogoto
 
+// FunctionMap is a map of functions that operate on the DataStack and
+// other DataStacks accessible through the RunSet.
 type FunctionMap map[string]func(DataStack, RunSet, Interpreter)
 
 // DataStack is a Stack used by the Interpreter
-// to store data and has functions that can manipulate
+// to store data of a specific type and has functions that can manipulate
 // data from the interpreter
 type DataStack interface {
 	Stack
@@ -12,6 +14,8 @@ type DataStack interface {
 	PushLiteral(string)
 }
 
+// ConversionFunc is a function that converts a string literal to an element
+// of an appropriate type.
 type ConversionFunc func(string) (Element, bool)
 
 type datastack struct {
@@ -94,6 +98,8 @@ func (s *datastack) Call(method string, r RunSet, i Interpreter) {
 	}
 }
 
+// PushLiteral converts a string literal to an appropriate type
+// and adds it to the stack.
 func (s *datastack) PushLiteral(sval string) {
 	el, ok := s.ConversionFunc(sval)
 	if ok {
@@ -116,5 +122,6 @@ func (s *NullDataStack) Call(method string, r RunSet, i Interpreter) {
 	// Does nothing
 }
 
+// PushLiteral accepts a string literal but does practically nothing.
 func (s *NullDataStack) PushLiteral(sval string) {
 }

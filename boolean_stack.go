@@ -4,6 +4,7 @@ import (
 	"strconv"
 )
 
+// NewBooleanStack generates a boolean DataStack.
 func NewBooleanStack(bools []bool) *datastack {
 	elements := Elements{}
 	for _, v := range bools {

@@ -4,6 +4,7 @@ import (
 	"strconv"
 )
 
+// NewIntegerStack generates an integer DataStack.
 func NewIntegerStack(ints []int64) *datastack {
 	elements := Elements{}
 	for _, v := range ints {

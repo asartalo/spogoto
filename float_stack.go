@@ -5,6 +5,7 @@ import (
 	"strconv"
 )
 
+// NewFloatStack generates a float DataStack.
 func NewFloatStack(floats []float64) *datastack {
 	elements := Elements{}
 	for _, v := range floats {

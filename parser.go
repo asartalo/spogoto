@@ -76,6 +76,8 @@ func (p *Parser) ParseItem(item string) Instruction {
 	return NewInstruction(t, item, fn)
 }
 
+// RegisterFunction registers a function of a type t and adds it to its
+// list of available functions.
 func (p *Parser) RegisterFunction(t string, fn string) {
 	m, ok := p.Functions[t]
 	if !ok {
@@ -87,6 +89,7 @@ func (p *Parser) RegisterFunction(t string, fn string) {
 
 }
 
+// Symbols return all available symbols/functions.
 func (p *Parser) Symbols() []string {
 	return p.symbols
 }

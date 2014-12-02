@@ -16,9 +16,8 @@ func ShouldMatch(actual interface{}, expected ...interface{}) string {
 
 	if r.MatchString(actual.(string)) {
 		return ""
-	} else {
-		return fmt.Sprintf("String %s did not match pattern %s", actual, expected[0])
 	}
+	return fmt.Sprintf("String %s did not match pattern %s", actual, expected[0])
 }
 
 func TestInterpreter(t *testing.T) {

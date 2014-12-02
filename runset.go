@@ -1,7 +1,12 @@
 package spogoto
 
+// CursorCommands are functions that operate on the Cursor manipulating
+// its position.
 type CursorCommands map[string]func(RunSet)
 
+// RunSet is a container for a Spogoto code's execution environment.
+// The RunSet contains the DataStacks that the code will operate on as
+// well as other information of regarding a code's execution.
 type RunSet interface {
 	RegisterStack(string, DataStack)
 	Stack(string) DataStack
@@ -15,6 +20,8 @@ type RunSet interface {
 	InstructionCount() int64
 }
 
+// Cursor is a representation of a pointer pointing to the current
+// Instruction on which the interpreter will have to execute.
 type Cursor struct {
 	Position     int64
 	Instructions InstructionSet
@@ -27,6 +34,7 @@ type runset struct {
 	instructionCount int64
 }
 
+// NewRunSet creates a RunSet.
 func NewRunSet(i Interpreter) *runset {
 	r := &runset{
 		dataStacks: map[string]DataStack{
@@ -40,18 +48,23 @@ func NewRunSet(i Interpreter) *runset {
 	return r
 }
 
+// Cursor returns the Cursor.
 func (r *runset) Cursor() *Cursor {
 	return &r.cursor
 }
 
+// IncrementInstructionCount increments the InstructionCount of course.
 func (r *runset) IncrementInstructionCount() {
 	r.instructionCount++
 }
 
+// InstructionCount returns the total number of Instructions executed for
+// a single run.
 func (r *runset) InstructionCount() int64 {
 	return r.instructionCount
 }
 
+// CursorCommand executes cursor-related functions.
 func (r *runset) CursorCommand(fn string) {
 	theFunc, ok := r.cursorCommands[fn]
 	if ok {
@@ -59,6 +72,7 @@ func (r *runset) CursorCommand(fn string) {
 	}
 }
 
+// CursorCommands returns all CursorCommands available.
 func (r *runset) CursorCommands() CursorCommands {
 	return r.cursorCommands
 }
@@ -90,6 +104,7 @@ func (r *runset) Bad(name string, count int64) bool {
 	return r.Stack(name).Lack(count)
 }
 
+// DataStacks returns all the DataStacks registered for this RunSet.
 func (r *runset) DataStacks() map[string]DataStack {
 	return r.dataStacks
 }

@@ -14,10 +14,15 @@ type Interpreter interface {
 	Run(string) RunSet
 }
 
+// Options sets the Instruction options changing its behavior depending
+// on what values are set on the fields.
 type Options struct {
+
+	// MaxInstructions is the maximum number of total instruction executions
 	MaxInstructions int64
 }
 
+// DefaultOptions is the default set of options.
 var DefaultOptions = Options{
 	MaxInstructions: 100,
 }
@@ -28,6 +33,7 @@ type interpreter struct {
 	Options Options
 }
 
+// Run executes a Spogoto code string and returns a RunSet as result.
 func (i *interpreter) Run(code string) (r RunSet) {
 	r = i.createRunSet()
 	instructions := i.Parser.Parse(code)
@@ -63,35 +69,42 @@ func (i *interpreter) Run(code string) (r RunSet) {
 	return r
 }
 
+// RandomCode generates a random code of the specified length.
 func (i *interpreter) RandomCode(length int64) string {
+	return strings.Join(i.RandomCodeArray(length), " ")
+}
+
+// RandomCodeArray generates a random code in array form of the specified length.
+func (i *interpreter) RandomCodeArray(length int64) []string {
 	var code []string
 	var k int64
 	for k = 0; k < length; k++ {
 		code = append(code, i.RandomInstruction())
 	}
 
-	return strings.Join(code, " ")
+	return code
 }
 
-// RandInt generates a random integer between 0 and 9
+// RandInt generates a random integer between 0 and 9.
 func (i *interpreter) RandInt() int64 {
 	return i.Rand.Int63n(10)
 }
 
-// RandFloat generates a random float number between 0 and 1
+// RandFloat generates a random float number between 0 and 1.
 func (i *interpreter) RandFloat() float64 {
 	return i.Rand.Float64()
 }
 
+// RandomInstruction generates a random instruction. An Instruction can either be
+// a literal or a function.
 func (i *interpreter) RandomInstruction() string {
 	if i.RandFloat() < 0.3 {
 		return i.RandomLiteral([]string{"integer", "float", "boolean"}[i.Rand.Int63n(3)])
-	} else {
-		return i.RandomSymbol()
 	}
+	return i.RandomSymbol()
 }
 
-// RandomLiteral
+// RandomLiteral generates a random literal instruction of type t.
 func (i *interpreter) RandomLiteral(t string) string {
 	switch t {
 	case "integer":
@@ -103,6 +116,7 @@ func (i *interpreter) RandomLiteral(t string) string {
 	}
 }
 
+// RandomSymbol generates a random DataSet or Cursor function.
 func (i *interpreter) RandomSymbol() string {
 	symbols := i.Parser.Symbols()
 	idx := i.Rand.Int63n(int64(len(symbols)))
@@ -112,9 +126,8 @@ func (i *interpreter) RandomSymbol() string {
 func (i *interpreter) randomBoolean() string {
 	if i.RandFloat() > 0.5 {
 		return "true"
-	} else {
-		return "false"
 	}
+	return "false"
 }
 
 func (i *interpreter) randomInteger() string {
@@ -136,19 +149,19 @@ func (i *interpreter) randomFloat() string {
 func (i *interpreter) setupParser(r RunSet) {
 	p := NewParser()
 	for t, stack := range r.DataStacks() {
-		for fn, _ := range stack.Functions() {
+		for fn := range stack.Functions() {
 			p.RegisterFunction(t, fn)
 		}
 	}
 
-	for fnc, _ := range r.CursorCommands() {
+	for fnc := range r.CursorCommands() {
 		p.RegisterFunction("cursor", fnc)
 	}
 
 	i.Parser = p
 }
 
-// NewInterpreter constructs a new Intepreter.
+// NewInterpreter constructs a new Intepreter configured with options.
 func NewInterpreter(options Options) *interpreter {
 	i := &interpreter{
 		Rand:    rand.New(rand.NewSource(time.Now().UnixNano())),
