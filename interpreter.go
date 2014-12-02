@@ -1,3 +1,4 @@
+// Package spogoto is an implementation of the stack-based language Spogoto.
 package spogoto
 
 import (
