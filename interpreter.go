@@ -4,7 +4,7 @@ package spogoto
 import (
 	"fmt"
 	"math/rand"
-	"strings"
+	"regexp"
 	"time"
 )
 
@@ -12,7 +12,7 @@ import (
 type Interpreter interface {
 	RandInt() int64
 	RandFloat() float64
-	Run(string) RunSet
+	Run(Code) RunSet
 }
 
 // Options sets the Instruction options changing its behavior depending
@@ -34,8 +34,15 @@ type interpreter struct {
 	Options Options
 }
 
+type Code []string
+
+func CodeFromString(str string) Code {
+	re := regexp.MustCompile("\\s+")
+	return Code(re.Split(str, -1))
+}
+
 // Run executes a Spogoto code string and returns a RunSet as result.
-func (i *interpreter) Run(code string) (r RunSet) {
+func (i *interpreter) Run(code Code) (r RunSet) {
 	r = i.createRunSet()
 	instructions := i.Parser.Parse(code)
 	inCount := int64(len(instructions))
@@ -70,14 +77,9 @@ func (i *interpreter) Run(code string) (r RunSet) {
 	return r
 }
 
-// RandomCode generates a random code of the specified length.
-func (i *interpreter) RandomCode(length int64) string {
-	return strings.Join(i.RandomCodeArray(length), " ")
-}
-
-// RandomCodeArray generates a random code in array form of the specified length.
-func (i *interpreter) RandomCodeArray(length int64) []string {
-	var code []string
+// RandomCodeArray generates a random code of the specified length.
+func (i *interpreter) RandomCode(length int64) Code {
+	var code = Code{}
 	var k int64
 	for k = 0; k < length; k++ {
 		code = append(code, i.RandomInstruction())

@@ -21,7 +21,7 @@ func TestParser(t *testing.T) {
 		})
 
 		Convey("It can parse integer literals", func() {
-			code := "1 98 -27"
+			code := CodeFromString("1 98 -27")
 			So(
 				parser.Parse(code), ShouldResemble,
 				InstructionSet{
@@ -33,7 +33,7 @@ func TestParser(t *testing.T) {
 		})
 
 		Convey("It can parse float literals", func() {
-			code := "0.528 3.14 -0.189"
+			code := CodeFromString("0.528 3.14 -0.189")
 			So(
 				parser.Parse(code), ShouldResemble,
 				InstructionSet{
@@ -45,7 +45,7 @@ func TestParser(t *testing.T) {
 		})
 
 		Convey("It can parse boolean literals", func() {
-			code := "true false"
+			code := CodeFromString("true false")
 			So(
 				parser.Parse(code), ShouldResemble,
 				InstructionSet{
@@ -56,7 +56,7 @@ func TestParser(t *testing.T) {
 		})
 
 		Convey("It can parse known data stack functions", func() {
-			code := "foo.bar foo.baz foo.+"
+			code := CodeFromString("foo.bar foo.baz foo.+")
 			So(
 				parser.Parse(code), ShouldResemble,
 				InstructionSet{
@@ -68,7 +68,7 @@ func TestParser(t *testing.T) {
 		})
 
 		Convey("It will ignore unknown data stacks and functions", func() {
-			code := "foo.- fool.bar foo.bar"
+			code := CodeFromString("foo.- fool.bar foo.bar")
 			So(
 				parser.Parse(code), ShouldResemble,
 				InstructionSet{

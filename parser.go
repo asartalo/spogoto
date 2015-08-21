@@ -39,11 +39,9 @@ func (p *Parser) FunctionRegistered(t string, fn string) bool {
 }
 
 // Parse parses string into an InstructionSet.
-func (p *Parser) Parse(code string) InstructionSet {
-	re := regexp.MustCompile("\\s+")
-	raw := re.Split(code, -1)
+func (p *Parser) Parse(code Code) InstructionSet {
 	i := InstructionSet{}
-	for _, item := range raw {
+	for _, item := range code {
 		parsed := p.ParseItem(item)
 		if parsed.Type != "" {
 			i = append(i, parsed)

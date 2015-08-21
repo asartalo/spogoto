@@ -73,7 +73,7 @@ func TestInterpreter(t *testing.T) {
 
 		// Code
 		Convey("When provided with code.", func() {
-			code := "5 8 integer.+"
+			code := CodeFromString("5 8 integer.+")
 
 			Convey("And Run()", func() {
 				result := i.Run(code)
@@ -234,7 +234,7 @@ func TestCursorFunctions(t *testing.T) {
 			var r RunSet
 
 			Convey(d.expectation, func() {
-				So(func() { r = i.Run(d.code) }, ShouldNotPanic)
+				So(func() { r = i.Run(CodeFromString(d.code)) }, ShouldNotPanic)
 				So(r.Stack("integer").Elements(), ShouldResemble, int64Elements(d.intsAfter))
 				So(r.Stack("boolean").Elements(), ShouldResemble, boolElements(d.boolsAfter))
 				So(r.Stack("float").Elements(), ShouldResemble, float64Elements(d.floatsAfter))

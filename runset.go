@@ -6,7 +6,7 @@ type CursorCommands map[string]func(RunSet)
 
 // RunSet is a container for a Spogoto code's execution environment.
 // The RunSet contains the DataStacks that the code will operate on as
-// well as other information of regarding a code's execution.
+// well as other information regarding a code's execution.
 type RunSet interface {
 	RegisterStack(string, DataStack)
 	Stack(string) DataStack
