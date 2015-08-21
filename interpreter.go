@@ -4,7 +4,6 @@ package spogoto
 import (
 	"fmt"
 	"math/rand"
-	"regexp"
 	"time"
 )
 
@@ -32,13 +31,6 @@ type interpreter struct {
 	Rand    *rand.Rand
 	Parser  *Parser
 	Options Options
-}
-
-type Code []string
-
-func CodeFromString(str string) Code {
-	re := regexp.MustCompile("\\s+")
-	return Code(re.Split(str, -1))
 }
 
 // Run executes a Spogoto code string and returns a RunSet as result.
