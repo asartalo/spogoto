@@ -19,6 +19,10 @@ func NewFloatStack(floats []float64) *datastack {
 	return d
 }
 
+func FloatStackConstructor() (string, DataStack) {
+	return "float", NewFloatStack([]float64{})
+}
+
 func addFloatFunctions(ds *datastack) {
 
 	ds.FunctionMap["+"] = func(d DataStack, r RunSet, i Interpreter) {

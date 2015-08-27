@@ -19,6 +19,10 @@ func NewIntegerStack(ints []int64) *datastack {
 	return d
 }
 
+func IntegerStackConstructor() (string, DataStack) {
+	return "integer", NewIntegerStack([]int64{})
+}
+
 func addIntegerFunctions(ds *datastack) {
 	ds.FunctionMap["+"] = func(d DataStack, r RunSet, i Interpreter) {
 		if d.Lack(2) {

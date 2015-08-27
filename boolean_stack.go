@@ -18,6 +18,10 @@ func NewBooleanStack(bools []bool) *datastack {
 	return d
 }
 
+func BooleanStackConstructor() (string, DataStack) {
+	return "boolean", NewBooleanStack([]bool{})
+}
+
 func addBooleanFunctions(ds *datastack) {
 
 	ds.FunctionMap["="] = func(d DataStack, r RunSet, i Interpreter) {

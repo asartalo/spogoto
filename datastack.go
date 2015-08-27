@@ -14,6 +14,8 @@ type DataStack interface {
 	PushLiteral(string)
 }
 
+type DataStackConstructor func() (string, DataStack)
+
 // ConversionFunc is a function that converts a string literal to an element
 // of an appropriate type.
 type ConversionFunc func(string) (Element, bool)

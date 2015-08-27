@@ -156,3 +156,22 @@ func TestOtherFloatStackFeatures(t *testing.T) {
 
 	})
 }
+
+func TestFloatStackConstructor(t *testing.T) {
+	Convey("Given an float stack constructor", t, func() {
+		constructor := FloatStackConstructor
+
+		Convey("When called", func() {
+			stackType, stack := constructor()
+
+			Convey("It should return float stack type", func() {
+				So(stackType, ShouldEqual, "float")
+			})
+
+			// TODO: There must be a correct way to do this
+			Convey("It should return a float stack", func() {
+				So(stack.Elements(), ShouldResemble, NewFloatStack([]float64{}).Elements())
+			})
+		})
+	})
+}

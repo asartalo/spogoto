@@ -109,3 +109,21 @@ func TestOtherBooleanStackFeatures(t *testing.T) {
 
 	})
 }
+
+func TestBooleanStackConstructor(t *testing.T) {
+	Convey("Given an boolean stack constructor", t, func() {
+		constructor := BooleanStackConstructor
+
+		Convey("When called", func() {
+			stackType, stack := constructor()
+
+			Convey("It should return boolean stack type", func() {
+				So(stackType, ShouldEqual, "boolean")
+			})
+
+			Convey("It should return a boolean stack", func() {
+				So(stack.Elements(), ShouldResemble, NewBooleanStack([]bool{}).Elements())
+			})
+		})
+	})
+}

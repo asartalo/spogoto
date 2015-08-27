@@ -152,3 +152,21 @@ func TestIntegerOtherFeatures(t *testing.T) {
 
 	})
 }
+
+func TestIntegerStackConstructor(t *testing.T) {
+	Convey("Given an integer stack constructor", t, func() {
+		constructor := IntegerStackConstructor
+
+		Convey("When called", func() {
+			stackType, stack := constructor()
+
+			Convey("It should return integer stack type", func() {
+				So(stackType, ShouldEqual, "integer")
+			})
+
+			Convey("It should return an integer stack", func() {
+				So(stack.Elements(), ShouldResemble, NewIntegerStack([]int64{}).Elements())
+			})
+		})
+	})
+}
