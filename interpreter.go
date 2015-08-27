@@ -27,8 +27,13 @@ var DefaultOptions = Options{
 	MaxInstructions: 100,
 }
 
+type Rand interface {
+	Int63n(int64) int64
+	Float64() float64
+}
+
 type interpreter struct {
-	Rand    *rand.Rand
+	Rand    Rand
 	Parser  *Parser
 	Options Options
 }
