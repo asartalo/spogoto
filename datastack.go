@@ -15,6 +15,7 @@ type DataStack interface {
 }
 
 type DataStackConstructor func() (string, DataStack)
+type DataStackConstructors []DataStackConstructor
 
 // ConversionFunc is a function that converts a string literal to an element
 // of an appropriate type.

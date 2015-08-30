@@ -12,6 +12,7 @@ type Interpreter interface {
 	RandInt() int64
 	RandFloat() float64
 	Run(Code) RunSet
+	StackConstructors() DataStackConstructors
 }
 
 // Options sets the Instruction options changing its behavior depending
@@ -20,11 +21,17 @@ type Options struct {
 
 	// MaxInstructions is the maximum number of total instruction executions
 	MaxInstructions int64
+
+	// Constructors for DataStacks to be used in the execution of code
+	StackConstructors DataStackConstructors
 }
 
 // DefaultOptions is the default set of options.
 var DefaultOptions = Options{
 	MaxInstructions: 100,
+	StackConstructors: []DataStackConstructor{
+		IntegerStackConstructor, FloatStackConstructor, BooleanStackConstructor,
+	},
 }
 
 type Rand interface {
@@ -72,6 +79,10 @@ func (i *interpreter) Run(code Code) (r RunSet) {
 	}
 
 	return r
+}
+
+func (i *interpreter) StackConstructors() DataStackConstructors {
+	return i.Options.StackConstructors
 }
 
 // RandomCodeArray generates a random code of the specified length.

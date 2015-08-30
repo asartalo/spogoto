@@ -36,9 +36,7 @@ type runset struct {
 
 // NewRunSet creates a RunSet.
 func NewRunSet(i Interpreter) *runset {
-	constructors := []DataStackConstructor{
-		IntegerStackConstructor, FloatStackConstructor, BooleanStackConstructor,
-	}
+	constructors := i.StackConstructors()
 	dataStacks := map[string]DataStack{}
 	for _, constructor := range constructors {
 		stackType, stack := constructor()
