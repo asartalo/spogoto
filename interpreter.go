@@ -4,14 +4,15 @@ package spogoto
 import (
 	"fmt"
 	"math/rand"
-	"time"
 )
 
 // Interpreter interprets Spogoto code.
 type Interpreter interface {
 	RandInt() int64
 	RandFloat() float64
-	Run(Code) RunSet
+	RandomInstruction() string
+	RandomCode(int64) Code
+	Run(Code, StackState) RunSet
 	StackConstructors() DataStackConstructors
 }
 
@@ -39,6 +40,18 @@ type Rand interface {
 	Float64() float64
 }
 
+type rander int
+
+func (r rander) Int63n(i int64) int64 {
+	return rand.Int63n(i)
+}
+
+func (r rander) Float64() float64 {
+	return rand.Float64()
+}
+
+type StackState map[string]Elements
+
 type interpreter struct {
 	Rand    Rand
 	Parser  *Parser
@@ -46,8 +59,8 @@ type interpreter struct {
 }
 
 // Run executes a Spogoto code string and returns a RunSet as result.
-func (i *interpreter) Run(code Code) (r RunSet) {
-	r = i.createRunSet()
+func (i *interpreter) Run(code Code, stackState StackState) (r RunSet) {
+	r = i.createRunSet(stackState)
 	instructions := i.Parser.Parse(code)
 	inCount := int64(len(instructions))
 	r.Cursor().Instructions = instructions
@@ -175,14 +188,20 @@ func (i *interpreter) setupParser(r RunSet) {
 // NewInterpreter constructs a new Intepreter configured with options.
 func NewInterpreter(options Options) *interpreter {
 	i := &interpreter{
-		Rand:    rand.New(rand.NewSource(time.Now().UnixNano())),
+		Rand:    rander(1),
 		Options: options,
 	}
-	i.setupParser(i.createRunSet())
+	i.setupParser(i.createRunSet(StackState{}))
 
 	return i
 }
 
-func (i *interpreter) createRunSet() *runset {
-	return NewRunSet(i)
+func (i *interpreter) createRunSet(stackState StackState) *runset {
+	r := NewRunSet(i)
+
+	for stackType, elements := range stackState {
+		r.InitializeStack(stackType, elements)
+	}
+
+	return r
 }

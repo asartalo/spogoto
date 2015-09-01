@@ -76,7 +76,7 @@ func TestInterpreter(t *testing.T) {
 			code := CodeFromString("5 8 integer.+")
 
 			Convey("And Run()", func() {
-				result := i.Run(code)
+				result := i.Run(code, make(StackState))
 
 				Convey("The code will be executed", func() {
 					var value int64
@@ -86,6 +86,22 @@ func TestInterpreter(t *testing.T) {
 
 				Convey("The result has the number of instructions executed", func() {
 					So(result.InstructionCount(), ShouldEqual, 3)
+				})
+			})
+		})
+
+		Convey("When provided with code and stack state.", func() {
+			code := CodeFromString("4 integer.+")
+			state := make(StackState)
+			state["integer"] = Elements{int64(5)}
+
+			Convey("And Run()", func() {
+				result := i.Run(code, state)
+
+				Convey("The code will be executed", func() {
+					var value int64
+					So(func() { value = result.Stack("integer").Pop().(int64) }, ShouldNotPanic)
+					So(value, ShouldEqual, 9)
 				})
 			})
 		})
@@ -232,9 +248,10 @@ func TestCursorFunctions(t *testing.T) {
 		Convey(fmt.Sprintf("%s on code `%s`", d.toTest, d.code), t, func() {
 			i := NewInterpreter(DefaultOptions)
 			var r RunSet
+			s := StackState{}
 
 			Convey(d.expectation, func() {
-				So(func() { r = i.Run(CodeFromString(d.code)) }, ShouldNotPanic)
+				So(func() { r = i.Run(CodeFromString(d.code), s) }, ShouldNotPanic)
 				So(r.Stack("integer").Elements(), ShouldResemble, int64Elements(d.intsAfter))
 				So(r.Stack("boolean").Elements(), ShouldResemble, boolElements(d.boolsAfter))
 				So(r.Stack("float").Elements(), ShouldResemble, float64Elements(d.floatsAfter))

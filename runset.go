@@ -13,11 +13,13 @@ type RunSet interface {
 	Ok(string, int64) bool
 	Bad(string, int64) bool
 	DataStacks() map[string]DataStack
+	DataStack(string) DataStack
 	Cursor() *Cursor
 	CursorCommand(string)
 	CursorCommands() CursorCommands
 	IncrementInstructionCount()
 	InstructionCount() int64
+	InitializeStack(string, Elements)
 }
 
 // Cursor is a representation of a pointer pointing to the current
@@ -107,6 +109,16 @@ func (r *runset) Bad(name string, count int64) bool {
 // DataStacks returns all the DataStacks registered for this RunSet.
 func (r *runset) DataStacks() map[string]DataStack {
 	return r.dataStacks
+}
+
+func (r *runset) InitializeStack(stackType string, elements Elements) {
+	for _, element := range elements {
+		r.dataStacks[stackType].Push(element)
+	}
+}
+
+func (r *runset) DataStack(stackType string) DataStack {
+	return r.dataStacks[stackType]
 }
 
 func instructionCount(r RunSet) int64 {
